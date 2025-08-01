@@ -1,13 +1,6 @@
-# Ensure consistent line endings
-* text=auto
+# Set all files to text and normalize line endings to LF
+* text=auto eol=lf
 
-# Force LF endings for specific file types (Unix style)
-*.ts text eol=lf
-*.tsx text eol=lf
-*.js text eol=lf
-*.jsx text eol=lf
-*.json text eol=lf
-*.html text eol=lf
-*.css text eol=lf
-*.md text eol=lf
+# Explicitly enforce LF for code and config files
+*.{ts,tsx,js,jsx,json,html,css,md} text eol=lf
 .gitignore text eol=lf
