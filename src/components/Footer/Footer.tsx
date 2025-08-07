@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import SODLogo from 'src/assets/images/SOD_Logo.png'
 import { FaFacebook, FaYoutube } from 'react-icons/fa'
 import { SiZalo } from 'react-icons/si'
+import path from 'src/constants/path'
 
 export default function Footer() {
   return (
@@ -22,17 +23,17 @@ export default function Footer() {
           <h3 className='font-semibold text-gray-900 mb-2 text-xl'>Chuyên mục</h3>
           <ul className='space-y-1 list-disc list-inside mt-4'>
             <li>
-              <Link to='#' className='hover:text-blue-500 text-base'>
+              <Link to={path.services} className='hover:text-blue-500 text-base'>
                 Dịch vụ
               </Link>
             </li>
             <li>
-              <Link to='#' className='hover:text-blue-500 text-base'>
+              <Link to={path.aboutUs} className='hover:text-blue-500 text-base'>
                 Về chúng tôi
               </Link>
             </li>
             <li>
-              <Link to='#' className='hover:text-blue-500 text-base'>
+              <Link to={path.privacyPolicy} className='hover:text-blue-500 text-base'>
                 Chính sách bảo mật
               </Link>
             </li>

@@ -6,6 +6,11 @@ import path from './constants/path'
 import RegisterLayout from './layouts/RegisterLayout'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import AboutUs from './pages/user/AboutUs'
+
+import PrivacyPolicy from './pages/user/PrivacyPolicy'
+import Services from './pages/user/Services'
+import Partners from './pages/user/Partners'
 
 const isAuthenticated = true
 function ProtectedRoute() {
@@ -32,6 +37,38 @@ export default function useRouteElements() {
       element: (
         <MainLayout>
           <NotFound />
+        </MainLayout>
+      )
+    },
+    {
+      path: path.aboutUs,
+      element: (
+        <MainLayout>
+          <AboutUs />
+        </MainLayout>
+      )
+    },
+    {
+      path: path.privacyPolicy,
+      element: (
+        <MainLayout>
+          <PrivacyPolicy />
+        </MainLayout>
+      )
+    },
+    {
+      path: path.services,
+      element: (
+        <MainLayout>
+          <Services />
+        </MainLayout>
+      )
+    },
+    {
+      path: path.partners,
+      element: (
+        <MainLayout>
+          <Partners />
         </MainLayout>
       )
     },
