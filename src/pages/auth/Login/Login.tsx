@@ -1,7 +1,29 @@
-import { Link } from 'react-router-dom'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useMutation } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import authApi from 'src/apis/auth.api'
 import ImageSlider from 'src/components/ImageSlider'
+import { schema, type Schema } from 'src/utils/rules'
+
+type FormData = Pick<Schema, 'email' | 'password'>
+const loginSchema = schema.pick(['email', 'password'])
 
 export default function Login() {
+  const navigate = useNavigate()
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors }
+  } = useForm<FormData>({
+    resolver: yupResolver(loginSchema)
+  })
+
+  // const loginMutaion = useMutation({
+  //   mutationFn: (body:) => authApi.loginAccount(body),
+  // })
+
   return (
     <div className='bg-gradient-to-br from-stone-100 via-white to-orange-50'>
       <div className='max-w-7xl mx-auto px-4'>
@@ -38,7 +60,7 @@ export default function Login() {
               </div>
               <div className='flex items-center justify-center mt-8'>
                 <span className='text-gray-400'>Bạn đã có tài khoản?</span>
-                <Link className='text-red-400 ml-1' to='/login'>
+                <Link className='text-red-400 ml-1' to='/register'>
                   Đăng ký
                 </Link>
               </div>

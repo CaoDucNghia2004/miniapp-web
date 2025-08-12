@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import HeroImage from 'src/assets/images/hero-minapp.png'
 import BenefitsSection from 'src/components/BenefitsSection'
 import CustomerSay from 'src/components/CustomerSay'
 import FeatureHighlight from 'src/components/FeatureHighlight'
 import ProjectTimeline from 'src/components/ProjectTimeline'
 import RegisterCTA from 'src/components/RegisterCTA'
+import path from 'src/constants/path'
 
 const features = [
   {
@@ -53,9 +55,12 @@ export default function Home() {
               ))}
             </ul>
             <div className='mt-8 flex flex-wrap gap-4'>
-              <button className='bg-orange-500 text-white px-6 py-3 rounded-md font-semibold hover:bg-orange-600 transition'>
+              <Link
+                to={path.register}
+                className='bg-orange-500 text-white px-6 py-3 rounded-md font-semibold hover:bg-orange-600 transition'
+              >
                 Đăng ký ngay
-              </button>
+              </Link>
               <button className='border border-orange-500 text-orange-500 px-6 py-3 rounded-md font-semibold hover:bg-orange-100 transition'>
                 Liên hệ tư vấn ngay
               </button>
