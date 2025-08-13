@@ -4,7 +4,10 @@ import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import authApi from 'src/apis/auth.api'
 import ImageSlider from 'src/components/ImageSlider'
+import Input from 'src/components/Input'
+import type { ErrorResponse } from 'src/types/utils.type'
 import { schema, type Schema } from 'src/utils/rules'
+import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
 
 type FormData = Pick<Schema, 'email' | 'password'>
 const loginSchema = schema.pick(['email', 'password'])
@@ -20,9 +23,25 @@ export default function Login() {
     resolver: yupResolver(loginSchema)
   })
 
-  // const loginMutaion = useMutation({
-  //   mutationFn: (body:) => authApi.loginAccount(body),
-  // })
+  const loginMutation = useMutation({
+    mutationFn: (body: FormData) => authApi.loginAccount(body)
+  })
+
+  const onSubmit = handleSubmit((data) => {
+    loginMutation.mutate(data, {
+      onSuccess: () => {
+        navigate('/')
+      },
+      onError: (error) => {
+        if (isAxiosUnprocessableEntityError<ErrorResponse<null>>(error)) {
+          const msg = error.response?.data?.message || error.message || 'Dữ liệu không hợp lệ'
+          setError('email', { type: 'server', message: msg })
+          setError('password', { type: 'server', message: msg })
+          return
+        }
+      }
+    })
+  })
 
   return (
     <div className='bg-gradient-to-br from-stone-100 via-white to-orange-50'>
@@ -32,26 +51,28 @@ export default function Login() {
             <ImageSlider />
           </div>
           <div className='lg:col-span-2 lg:col-start-4'>
-            <form className='p-10 rounded bg-white shadow-sm'>
+            <form className='p-10 rounded bg-white shadow-sm' onSubmit={onSubmit} noValidate>
               <div className='text-2xl'>Đăng nhập</div>
-              <div className='mt-8'>
-                <input
-                  type='email'
-                  name='email'
-                  className='p-3 w-full outline-none border border-gray-300 focus:border-gray-500 rounded-sm focus:shadow-sm'
-                  placeholder='Email'
-                />
-                <div className='mt-1 text-red-600 min-h-[1rem] text-sm'></div>
-              </div>
-              <div className='mt-3'>
-                <input
-                  type='password'
-                  name='password'
-                  className='p-3 w-full outline-none border border-gray-300 focus:border-gray-500 rounded-sm focus:shadow-sm'
-                  placeholder='Password'
-                />
-                <div className='mt-1 text-red-600 min-h-[1rem] text-sm'></div>
-              </div>
+              <Input
+                name='email'
+                register={register}
+                type='email'
+                className='mt-8'
+                errorMessage={errors.email?.message}
+                placeholder='Email'
+                // rules={rules.email}
+              />
+              <Input
+                name='password'
+                register={register}
+                type='password'
+                className='mt-2'
+                classNameEye='absolute right-[5px] h-5 w-5 cursor-pointer top-[12px]'
+                errorMessage={errors.password?.message}
+                placeholder='Mật khẩu'
+                // rules={rules.password}
+                autoComplete='on'
+              />
 
               <div className='mt-3'>
                 <button className='w-full text-center py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'>

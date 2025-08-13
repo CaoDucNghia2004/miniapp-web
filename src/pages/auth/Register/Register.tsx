@@ -33,6 +33,7 @@ export default function Register() {
     registerUserFormMutation.mutate(data, {
       onSuccess: (data) => {
         console.log('Register success', data)
+        navigate('/')
       },
       onError: (error) => {
         if (isAxiosUnprocessableEntityError<ErrorResponse<null>>(error)) {
