@@ -46,7 +46,8 @@ export const schema = yup.object({
     .required('Password là bắt buộc')
     .min(6, 'Độ dài từ 6 - 160 ký tự')
     .max(160, 'Độ dài từ 6 - 160 ký tự'),
-  confirm_password: handleConfirmPassword('password')
+  confirm_password: handleConfirmPassword('password'),
+  avatar: yup.string().max(1000, 'Độ dài tối đa là 1000 ký tự').optional()
 })
 
 export type Schema = yup.InferType<typeof schema>

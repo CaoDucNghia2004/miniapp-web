@@ -11,13 +11,24 @@ import AboutUs from './pages/user/AboutUs'
 import PrivacyPolicy from './pages/user/PrivacyPolicy'
 import Services from './pages/user/Services'
 import Partners from './pages/user/Partners'
+import { useContext } from 'react'
+import { AppContext } from './contexts/app.context'
+import UserLayout from './pages/user/User/layouts/UserLayout'
+import Profile from './pages/user/User/pages/Profile'
+import ChangePassword from './pages/user/User/pages/ChangePassword'
+import ProjectLayout from './pages/user/Projects/layouts/ProjectLayout'
+import DashboardUser from './pages/user/Projects/pages/DashboardUser'
+import ProjectDetail from './pages/user/Projects/pages/ProjectDetail'
+import ProjectComment from './pages/user/Projects/pages/ProjectComment'
+import ProjectContract from './pages/user/Projects/pages/ProjectContract'
 
-const isAuthenticated = true
 function ProtectedRoute() {
+  const { isAuthenticated } = useContext(AppContext)
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />
 }
 
-function RejectRoute() {
+function RejectedRoute() {
+  const { isAuthenticated } = useContext(AppContext)
   return !isAuthenticated ? <Outlet /> : <Navigate to='/' />
 }
 
@@ -73,13 +84,78 @@ export default function useRouteElements() {
       )
     },
     {
-      path: path.login,
-      element: (
-        <RegisterLayout>
-          <Login />
-        </RegisterLayout>
-      )
+      path: '',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: path.user,
+          element: (
+            <MainLayout>
+              <UserLayout />
+            </MainLayout>
+          ),
+          children: [
+            {
+              path: path.profile,
+              element: <Profile />
+            },
+            {
+              path: path.changePassword,
+              element: <ChangePassword />
+            }
+          ]
+        }
+      ]
     },
+
+    {
+      path: '',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: path.project,
+          element: (
+            <MainLayout>
+              <ProjectLayout />
+            </MainLayout>
+          ),
+          children: [
+            {
+              path: path.projectDashboard,
+              element: <DashboardUser />
+            },
+            {
+              path: path.projectDetail,
+              element: <ProjectDetail />
+            },
+            {
+              path: path.projectComment,
+              element: <ProjectComment />
+            },
+            {
+              path: path.projectContract,
+              element: <ProjectContract />
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      path: '',
+      element: <RejectedRoute />,
+      children: [
+        {
+          path: path.login,
+          element: (
+            <RegisterLayout>
+              <Login />
+            </RegisterLayout>
+          )
+        }
+      ]
+    },
+
     {
       path: path.register,
       element: (

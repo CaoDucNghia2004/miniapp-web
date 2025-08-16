@@ -1,10 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
+import { useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import authApi from 'src/apis/auth.api'
 import ImageSlider from 'src/components/ImageSlider'
 import Input from 'src/components/Input'
+import { AppContext } from 'src/contexts/app.context'
 import type { ErrorResponse } from 'src/types/utils.type'
 import { schema, type Schema } from 'src/utils/rules'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
@@ -13,6 +15,8 @@ type FormData = Pick<Schema, 'email' | 'password'>
 const loginSchema = schema.pick(['email', 'password'])
 
 export default function Login() {
+  const { setIsAuthenticated } = useContext(AppContext)
+
   const navigate = useNavigate()
   const {
     register,
@@ -30,6 +34,7 @@ export default function Login() {
   const onSubmit = handleSubmit((data) => {
     loginMutation.mutate(data, {
       onSuccess: () => {
+        setIsAuthenticated(true)
         navigate('/')
       },
       onError: (error) => {
