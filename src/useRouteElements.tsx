@@ -21,6 +21,7 @@ import DashboardUser from './pages/user/Projects/pages/DashboardUser'
 import ProjectDetail from './pages/user/Projects/pages/ProjectDetail'
 import ProjectComment from './pages/user/Projects/pages/ProjectComment'
 import ProjectContract from './pages/user/Projects/pages/ProjectContract'
+import ForgotPassword from './components/ForgotPassword'
 
 function ProtectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
@@ -80,6 +81,14 @@ export default function useRouteElements() {
       element: (
         <MainLayout>
           <Partners />
+        </MainLayout>
+      )
+    },
+    {
+      path: path.forgotPassword,
+      element: (
+        <MainLayout>
+          <ForgotPassword />
         </MainLayout>
       )
     },

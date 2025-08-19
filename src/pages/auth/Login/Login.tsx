@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import authApi from 'src/apis/auth.api'
 import ImageSlider from 'src/components/ImageSlider'
 import Input from 'src/components/Input'
+import path from 'src/constants/path'
 import { AppContext } from 'src/contexts/app.context'
 
 import type { ErrorResponse } from 'src/types/utils.type'
@@ -141,6 +142,12 @@ export default function Login() {
                   autoComplete='on'
                 />
 
+                <div className='flex justify-end mt-2 mb-1'>
+                  <Link to={path.forgotPassword} className='text-sm text-blue-500 hover:underline'>
+                    Quên mật khẩu?
+                  </Link>
+                </div>
+
                 <div className='mt-3'>
                   <button className='w-full text-center py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'>
                     Đăng nhập
@@ -148,7 +155,7 @@ export default function Login() {
                 </div>
                 <div className='flex items-center justify-center mt-8'>
                   <span className='text-gray-400'>Bạn đã có tài khoản?</span>
-                  <Link className='text-red-400 ml-1' to='/register'>
+                  <Link className='text-red-400 ml-1' to={path.register}>
                     Đăng ký
                   </Link>
                 </div>
