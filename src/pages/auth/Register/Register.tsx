@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import formsApi from 'src/apis/forms.api'
 import ImageSlider from 'src/components/ImageSlider'
 import Input from 'src/components/Input'
@@ -33,12 +34,20 @@ export default function Register() {
     registerUserFormMutation.mutate(data, {
       onSuccess: (data) => {
         console.log('Register success', data)
+        toast.success(data.data.message)
         navigate('/')
       },
       onError: (error) => {
         if (isAxiosUnprocessableEntityError<ErrorResponse<null>>(error)) {
           const msg = error.response?.data?.message || error.message || 'Dữ liệu không hợp lệ'
-          setError('email', { type: 'server', message: msg })
+          if (msg.toLowerCase().includes('phone')) {
+            setError('phone', { type: 'server', message: msg })
+          } else if (msg.toLowerCase().includes('email')) {
+            setError('email', { type: 'server', message: msg })
+          } else {
+            // fallback: gắn cho email
+            setError('email', { type: 'server', message: msg })
+          }
           return
         }
       }

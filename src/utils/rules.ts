@@ -47,7 +47,8 @@ export const schema = yup.object({
     .min(6, 'Độ dài từ 6 - 160 ký tự')
     .max(160, 'Độ dài từ 6 - 160 ký tự'),
   confirm_password: handleConfirmPassword('password'),
-  avatar: yup.string().max(1000, 'Độ dài tối đa là 1000 ký tự').optional()
+  avatar: yup.string().max(1000, 'Độ dài tối đa là 1000 ký tự').optional(),
+  code: yup.string().required('Mã xác minh là bắt buộc').length(6, 'Mã xác minh phải có 6 ký tự')
 })
 
 export const changePasswordSchema = yup.object({
