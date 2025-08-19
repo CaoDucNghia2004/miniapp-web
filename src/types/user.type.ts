@@ -6,3 +6,9 @@ export interface User {
   companyName?: string
   avatar?: string
 }
+
+export interface uploadAvatarResType {
+  fileName: string
+  fileUrl: string
+  uploadedAt: string
+}

@@ -1,21 +1,26 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
 import userApi from 'src/apis/user.api'
 import Button from 'src/components/Button'
 import Input from 'src/components/Input'
+import { AppContext } from 'src/contexts/app.context'
 import type { User } from 'src/types/user.type'
 import type { SuccessResponse } from 'src/types/utils.type'
+import { setProfileToLS } from 'src/utils/auth'
 import { schema, type Schema } from 'src/utils/rules'
+import { getAvatarUrl } from 'src/utils/utils'
 
 type FormData = Pick<Schema, 'email' | 'name' | 'phone' | 'companyName' | 'avatar'>
 const profileSchema = schema.pick(['email', 'name', 'phone', 'companyName', 'avatar'])
 
 export default function Profile() {
+  const { setProfile } = useContext(AppContext)
   const [file, setFile] = useState<File | null>(null)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
-  const { data: profileData } = useQuery<SuccessResponse<User>>({
+  const { data: profileData, refetch } = useQuery<SuccessResponse<User>>({
     queryKey: ['profile'],
     queryFn: () => userApi.getUser().then((res) => res.data)
   })
@@ -56,11 +61,37 @@ export default function Profile() {
     if (file) {
       return URL.createObjectURL(file)
     }
-    return watch('avatar') || ''
+    return watch('avatar')
   }, [file, watch])
 
-  const onSubmit = handleSubmit((data: FormData) => {
-    console.log(data)
+  const uploadAvatarMutation = useMutation({
+    mutationFn: userApi.uploadAvatar
+  })
+  const updateProfileMutation = useMutation({
+    mutationFn: userApi.updateProfile
+  })
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      if (file) {
+        const form = new FormData()
+        form.append('file', file)
+        form.append('folder', 'avatar')
+        const uploadRes = await uploadAvatarMutation.mutateAsync({
+          body: form,
+          folder: 'avatar'
+        })
+        data.avatar = uploadRes.data.data.fileUrl
+      }
+      const res = await updateProfileMutation.mutateAsync(data)
+      setProfile(res.data.data)
+      setProfileToLS(res.data.data)
+      refetch()
+      toast.success(res.data.message || 'Cập nhật hồ sơ thành công')
+    } catch (error) {
+      console.log(error)
+      toast.error('Có lỗi xảy ra khi upload avatar')
+    }
   })
 
   return (
@@ -125,7 +156,7 @@ export default function Profile() {
           <div className='flex flex-col items-center'>
             <div className='my-5 h-26 w-26 overflow-hidden rounded-full'>
               <img
-                src={previewAvatarFromFile || 'https://cf.shopee.vn/file/d04ea22afab6e6d250a370d7ccc2e675_tn'}
+                src={previewAvatarFromFile || getAvatarUrl(watch('avatar'))}
                 alt='avatar'
                 className='w-full rounded-full object-cover'
               />
@@ -138,8 +169,11 @@ export default function Profile() {
               onChange={(event) => {
                 const file = event.target.files?.[0]
                 if (file) {
+                  if (file.size > 1024 * 1024) {
+                    toast.error('File quá lơn vui lòng chọn ảnh dưới 1MB')
+                    return
+                  }
                   setFile(file)
-                  // field.onChange('http://localhost:3000/' + file.name)
                 }
               }}
             />

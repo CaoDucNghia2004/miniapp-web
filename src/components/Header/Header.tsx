@@ -4,28 +4,23 @@ import ProcedurePdf from 'src/assets/docs/QuyTrinh.pdf'
 import Popover from '../Popover'
 import { useContext } from 'react'
 import { AppContext } from 'src/contexts/app.context'
-import { useQuery } from '@tanstack/react-query'
-import type { SuccessResponse } from 'src/types/utils.type'
-import type { User } from 'src/types/user.type'
-import userApi from 'src/apis/user.api'
 import path from 'src/constants/path'
+
+import { getAvatarUrl } from 'src/utils/utils'
+import { clearAccessTokenFromLS, clearProfileFromLS } from 'src/utils/auth'
 
 export default function Header() {
   const navigate = useNavigate()
-  const { isAuthenticated, setIsAuthenticated } = useContext(AppContext)
+  const { isAuthenticated, setIsAuthenticated, setProfile, profile } = useContext(AppContext)
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `transition-colors ${isActive ? 'text-orange-500' : 'text-gray-800 hover:text-orange-500'}`
   const externalNavClass = 'transition-colors text-gray-800 hover:text-orange-500 font-bold'
 
-  const { data: userData } = useQuery<SuccessResponse<User>>({
-    queryKey: ['profile'],
-    queryFn: () => userApi.getUser().then((res) => res.data),
-    enabled: isAuthenticated
-  })
-
   const handleLogout = () => {
-    localStorage.removeItem('access_token')
+    clearAccessTokenFromLS()
+    clearProfileFromLS()
     setIsAuthenticated(false)
+    setProfile(null)
     navigate('/login')
   }
 
@@ -89,10 +84,16 @@ export default function Header() {
               </div>
             }
           >
-            <div className='w-5 h-5 mr-2 shrink-0'>
-              <img src={userData?.data.avatar} alt='avatar' className='w-full h-full object-cover rounded-full' />
+            <div className='flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-50'>
+              <div className='w-10 h-10 rounded-full overflow-hidden shadow-md transition-transform duration-300 hover:scale-105'>
+                <img src={getAvatarUrl(profile?.avatar)} alt='avatar' className='w-full h-full object-cover' />
+              </div>
+
+              <div className='flex flex-col'>
+                <span className='text-sm font-semibold text-gray-900'>{profile?.name || 'Người dùng'}</span>
+                <span className='text-xs text-gray-500 truncate max-w-[150px]'>{profile?.email}</span>
+              </div>
             </div>
-            <div>{userData?.data.name || userData?.data.email}</div>
           </Popover>
         )}
       </div>

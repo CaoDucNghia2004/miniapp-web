@@ -1,28 +1,22 @@
 import { NavLink, Link } from 'react-router-dom'
 import path from 'src/constants/path'
 import { User, Lock, Pencil } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
-import type { SuccessResponse } from 'src/types/utils.type'
-import type { User as UserType } from 'src/types/user.type'
-import userApi from 'src/apis/user.api'
+import { useContext } from 'react'
+import { AppContext } from 'src/contexts/app.context'
+
+import { getAvatarUrl } from 'src/utils/utils'
 
 export default function UserSideNav() {
-  const { data } = useQuery<SuccessResponse<UserType>>({
-    queryKey: ['profile'],
-    queryFn: () => userApi.getUser().then((res) => res.data)
-  })
-
-  const avatar = data?.data.avatar || 'https://cf.shopee.vn/file/d04ea22afab6e6d250a370d7ccc2e675_tn'
-  const name = data?.data.name || 'Người dùng'
+  const { profile } = useContext(AppContext)
 
   return (
     <div className='rounded-md bg-white p-3 shadow'>
       <div className='flex items-center border-b border-gray-200 pb-4'>
         <Link to={path.profile} className='h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-gray-300'>
-          <img src={avatar} alt='avatar' className='h-full w-full object-cover' />
+          <img src={getAvatarUrl(profile?.avatar)} alt='avatar' className='h-full w-full object-cover' />
         </Link>
         <div className='flex-grow pl-4'>
-          <div className='mb-1 truncate font-semibold text-gray-800'>{name}</div>
+          <div className='mb-1 truncate font-semibold text-gray-800'>{profile?.name || 'Người dùng'}</div>
           <Link to={path.profile} className='flex items-center text-sm text-gray-500 hover:text-orange-500 transition'>
             <Pencil size={14} className='mr-1' />
             Sửa hồ sơ

@@ -1,8 +1,9 @@
 import axios, { AxiosError, type AxiosInstance } from 'axios'
 import { toast } from 'react-toastify'
 import HttpStatusCode from 'src/constants/httpStatusCode.enum'
-import { getAccessTokenFromLS, setAccessTokenToLS } from './auth'
+import { getAccessTokenFromLS, setAccessTokenToLS, setProfileToLS } from './auth'
 import type { AuthResponse } from 'src/types/auth.type'
+import config from 'src/constants/config'
 
 class Http {
   instance: AxiosInstance
@@ -10,7 +11,7 @@ class Http {
   constructor() {
     this.accessToken = getAccessTokenFromLS()
     this.instance = axios.create({
-      baseURL: 'http://localhost:8080',
+      baseURL: config.baseUrl,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'
@@ -34,8 +35,10 @@ class Http {
       (response) => {
         const { url } = response.config
         if (url === '/api/v1/auth/login') {
-          this.accessToken = (response.data as AuthResponse).data.accessToken
+          const data = response.data as AuthResponse
+          this.accessToken = data.data.accessToken
           setAccessTokenToLS(this.accessToken)
+          setProfileToLS(data.data.user)
         }
         //  else if (url === '/api/v1/auth/logout') {
         //   //xem lại cách xử lý logout của BE

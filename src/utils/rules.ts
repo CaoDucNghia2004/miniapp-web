@@ -50,4 +50,20 @@ export const schema = yup.object({
   avatar: yup.string().max(1000, 'Độ dài tối đa là 1000 ký tự').optional()
 })
 
+export const changePasswordSchema = yup.object({
+  oldPassword: yup
+    .string()
+    .required('Mật khẩu cũ là bắt buộc')
+    .min(6, 'Độ dài từ 6 - 160 ký tự')
+    .max(160, 'Độ dài từ 6 - 160 ký tự'),
+  newPassword: yup
+    .string()
+    .required('Mật khẩu mới là bắt buộc')
+    .min(6, 'Độ dài từ 6 - 160 ký tự')
+    .max(160, 'Độ dài từ 6 - 160 ký tự'),
+  confirmPassword: handleConfirmPassword('newPassword')
+})
+
+export type ChangePasswordSchema = yup.InferType<typeof changePasswordSchema>
+
 export type Schema = yup.InferType<typeof schema>
