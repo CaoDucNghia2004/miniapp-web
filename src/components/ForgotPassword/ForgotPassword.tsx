@@ -10,6 +10,7 @@ import { schema, type Schema } from 'src/utils/rules'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import Input from '../Input'
 import { Mail, LockKeyhole, KeyRound } from 'lucide-react'
+import path from 'src/constants/path'
 
 type EmailForm = Pick<Schema, 'email'>
 const emailSchema = schema.pick(['email'])
@@ -121,7 +122,7 @@ export default function ForgotPassword() {
             </button>
 
             <div className='text-center'>
-              <Link to='/login' className='text-sm text-indigo-600 hover:underline'>
+              <Link to={path.login} className='text-sm text-indigo-600 hover:underline'>
                 ← Quay lại đăng nhập
               </Link>
             </div>

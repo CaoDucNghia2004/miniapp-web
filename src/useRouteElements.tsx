@@ -22,6 +22,8 @@ import ProjectDetail from './pages/user/Projects/pages/ProjectDetail'
 import ProjectComment from './pages/user/Projects/pages/ProjectComment'
 import ProjectContract from './pages/user/Projects/pages/ProjectContract'
 import ForgotPassword from './components/ForgotPassword'
+import AdminLayout from './pages/admin/layouts/AdminLayout'
+import AdminDashboard from './pages/admin/pages/AdminDashboard'
 
 function ProtectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
@@ -31,6 +33,12 @@ function ProtectedRoute() {
 function RejectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
   return !isAuthenticated ? <Outlet /> : <Navigate to='/' />
+}
+
+function AdminRoute() {
+  const { isAuthenticated, profile } = useContext(AppContext)
+  if (!isAuthenticated) return <Navigate to={path.login} />
+  return profile?.email?.toLowerCase() === 'admin@gmail.com' ? <Outlet /> : <Navigate to={path.home} />
 }
 
 export default function useRouteElements() {
@@ -145,6 +153,22 @@ export default function useRouteElements() {
               path: path.projectContract,
               element: <ProjectContract />
             }
+          ]
+        }
+      ]
+    },
+    {
+      path: '',
+      element: <AdminRoute />,
+      children: [
+        {
+          path: path.admin, // '/admin'
+          element: <AdminLayout />, // AdminLayout có <Outlet />
+          children: [
+            { path: path.adminDashboard, element: <AdminDashboard /> }
+            // có thể thêm:
+            // { path: '/admin/customers', element: <CustomerManagement /> },
+            // { path: '/admin/contracts', element: <ContractManagement /> },
           ]
         }
       ]

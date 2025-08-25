@@ -14,7 +14,10 @@ const path = {
   projectDetail: '/project/project-details',
   projectContract: '/project/project-contract',
   projectComment: '/project/project-comment',
-  forgotPassword: '/forgot-password'
+  forgotPassword: '/forgot-password',
+
+  admin: '/admin',
+  adminDashboard: '/admin/dashboard'
 } as const
 
 export default path

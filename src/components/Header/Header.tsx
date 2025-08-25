@@ -69,12 +69,22 @@ export default function Header() {
                 >
                   Tài khoản của tôi
                 </Link>
-                <Link
-                  to={path.projectDashboard}
-                  className='block py-3 px-4 hover:bg-slate-100 bg-white hover:text-cyan-500 w-full text-left'
-                >
-                  Dự án của bạn
-                </Link>
+
+                {profile?.email === 'admin@gmail.com' ? (
+                  <Link
+                    to={path.adminDashboard}
+                    className='block py-3 px-4 hover:bg-slate-100 bg-white hover:text-cyan-500 w-full text-left'
+                  >
+                    Quản lý admin
+                  </Link>
+                ) : (
+                  <Link
+                    to={path.projectDashboard}
+                    className='block py-3 px-4 hover:bg-slate-100 bg-white hover:text-cyan-500 w-full text-left'
+                  >
+                    Dự án của bạn
+                  </Link>
+                )}
                 <button
                   className='block py-3 px-4 hover:bg-slate-100 bg-white hover:text-cyan-500 w-full text-left'
                   onClick={handleLogout}
