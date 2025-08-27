@@ -24,6 +24,14 @@ import ProjectContract from './pages/user/Projects/pages/ProjectContract'
 import ForgotPassword from './components/ForgotPassword'
 import AdminLayout from './pages/admin/layouts/AdminLayout'
 import AdminDashboard from './pages/admin/pages/AdminDashboard'
+import AdminQuotes from './pages/admin/pages/AdminQuotes'
+import CustomerManagement from './pages/admin/pages/CustomerManagement'
+import ContractManagement from './pages/admin/pages/ContractManagement'
+import PaymentManagement from './pages/admin/pages/PaymentManagement'
+import ProjectManagement from './pages/admin/pages/ProjectManagement'
+import ImplementedProjects from './pages/admin/pages/ImplementedProjects'
+import TransactionHistory from './pages/admin/pages/TransactionHistory'
+import AccountRequests from './pages/admin/pages/AccountRequests'
 
 function ProtectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
@@ -165,10 +173,15 @@ export default function useRouteElements() {
           path: path.admin, // '/admin'
           element: <AdminLayout />, // AdminLayout có <Outlet />
           children: [
-            { path: path.adminDashboard, element: <AdminDashboard /> }
-            // có thể thêm:
-            // { path: '/admin/customers', element: <CustomerManagement /> },
-            // { path: '/admin/contracts', element: <ContractManagement /> },
+            { path: path.adminDashboard, element: <AdminDashboard /> },
+            { path: '/admin/quotes', element: <AdminQuotes /> },
+            { path: '/admin/customers', element: <CustomerManagement /> },
+            { path: '/admin/contracts', element: <ContractManagement /> },
+            { path: '/admin/payments', element: <PaymentManagement /> },
+            { path: '/admin/projects', element: <ProjectManagement /> },
+            { path: '/admin/implemented', element: <ImplementedProjects /> },
+            { path: '/admin/history', element: <TransactionHistory /> },
+            { path: '/admin/registrations', element: <AccountRequests /> }
           ]
         }
       ]
