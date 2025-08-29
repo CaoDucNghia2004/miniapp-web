@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 import HeroImage from 'src/assets/images/hero-minapp.png'
@@ -9,10 +8,6 @@ import FeatureHighlight from 'src/components/FeatureHighlight'
 import ProjectTimeline from 'src/components/ProjectTimeline'
 import RegisterCTA from 'src/components/RegisterCTA'
 import path from 'src/constants/path'
-
-const PHONE = '0867173946'
-const ZALO = '0867173946'
-const EMAIL = 'support@miniapp.vn'
 
 const features = [
   {
@@ -33,25 +28,6 @@ const features = [
 ]
 
 export default function Home() {
-  const [showConsult, setShowConsult] = useState(false)
-  const [consulted, setConsulted] = useState(false)
-
-  const copy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-    } catch {
-      // no-op
-    }
-  }
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowConsult(false)
-    }
-    if (showConsult) document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [showConsult])
-
   return (
     <main>
       <section className='py-16'>
@@ -88,17 +64,6 @@ export default function Home() {
               >
                 Đăng ký ngay
               </Link>
-
-              <button
-                onClick={() => {
-                  setConsulted(false)
-                  setShowConsult(true)
-                }}
-                className='border border-orange-500 text-orange-500 px-6 py-3 rounded-md font-semibold hover:bg-orange-100 transition'
-                aria-label='Liên hệ tư vấn ngay'
-              >
-                Liên hệ tư vấn ngay
-              </button>
             </div>
           </motion.div>
 
@@ -142,159 +107,6 @@ export default function Home() {
       <BenefitsSection />
       <CustomerSay />
       <RegisterCTA />
-
-      {/* MODAL LIÊN HỆ TƯ VẤN */}
-      <AnimatePresence>
-        {showConsult && (
-          <motion.div
-            className='fixed inset-0 z-50 flex items-center justify-center p-4'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className='absolute inset-0 bg-black/40' onClick={() => setShowConsult(false)} />
-
-            <motion.div
-              role='dialog'
-              aria-modal='true'
-              className='relative z-10 w-full max-w-3xl rounded-2xl border bg-white p-6 shadow-xl'
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 15, opacity: 0 }}
-            >
-              <div className='mb-4 flex items-center justify-between'>
-                <h3 className='text-xl font-semibold'>{consulted ? 'Cảm ơn bạn đã liên hệ!' : 'Liên hệ tư vấn'}</h3>
-                <button
-                  onClick={() => setShowConsult(false)}
-                  className='rounded-full px-2 py-1 text-xl leading-none hover:bg-gray-100'
-                  aria-label='Đóng'
-                >
-                  ×
-                </button>
-              </div>
-
-              {!consulted ? (
-                <>
-                  <p className='text-sm text-gray-600'>
-                    Gọi/Zalo trực tiếp, chuẩn bị vài thông tin bên dưới để tư vấn nhanh hơn nhé.
-                  </p>
-
-                  <div className='mt-4 grid gap-3 md:grid-cols-3'>
-                    <div className='rounded-xl border p-4'>
-                      <div className='text-xs uppercase text-gray-500 font-semibold'>Điện thoại</div>
-                      <div className='mt-1 text-lg font-semibold'>{PHONE}</div>
-                      <div className='mt-3 flex gap-2'>
-                        <a
-                          href={`tel:${PHONE.replace(/\s/g, '')}`}
-                          className='rounded-lg bg-orange-500 px-3 py-2 text-sm text-white hover:bg-orange-600'
-                        >
-                          Gọi ngay
-                        </a>
-                        <button
-                          onClick={() => copy(PHONE)}
-                          className='rounded-lg border px-3 py-2 text-sm hover:bg-gray-50'
-                        >
-                          Sao chép
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className='rounded-xl border p-4'>
-                      <div className='text-xs uppercase text-gray-500 font-semibold'>Zalo</div>
-                      <div className='mt-1 text-lg font-semibold'>{ZALO}</div>
-                      <div className='mt-3 flex gap-2'>
-                        <a
-                          href={`https://zalo.me/${ZALO.replace(/\D/g, '')}`}
-                          target='_blank'
-                          rel='noreferrer'
-                          className='rounded-lg bg-sky-500 px-3 py-2 text-sm text-white hover:bg-sky-600'
-                        >
-                          Nhắn Zalo
-                        </a>
-                        <button
-                          onClick={() => copy(ZALO)}
-                          className='rounded-lg border px-3 py-2 text-sm hover:bg-gray-50'
-                        >
-                          Sao chép
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className='rounded-xl border p-4'>
-                      <div className='text-xs uppercase text-gray-500 font-semibold'>Email</div>
-                      <div className='mt-1 text-lg font-semibold'>{EMAIL}</div>
-                      <div className='mt-3 flex gap-2'>
-                        <a
-                          href={`mailto:${EMAIL}`}
-                          className='rounded-lg bg-gray-900 px-3 py-2 text-sm text-white hover:bg-black/80'
-                        >
-                          Gửi email
-                        </a>
-                        <button
-                          onClick={() => copy(EMAIL)}
-                          className='rounded-lg border px-3 py-2 text-sm hover:bg-gray-50'
-                        >
-                          Sao chép
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className='mt-6 rounded-xl bg-gray-50 p-4'>
-                    <div className='text-sm font-semibold'>Thông tin nên chuẩn bị khi gọi</div>
-                    <ul className='mt-2 grid gap-2 md:grid-cols-2 text-sm text-gray-700'>
-                      <li>• Lĩnh vực/Ngành nghề</li>
-                      <li>• Mục tiêu/ý tưởng chính của miniapp</li>
-                      <li>• Tính năng ưu tiên (đặt lịch, loyalty, thanh toán…)</li>
-                      <li>• Kinh phí dự kiến & mốc thời gian</li>
-                      <li>• Tên công ty/brand & Zalo OA (nếu có)</li>
-                    </ul>
-                  </div>
-
-                  <div className='mt-6 flex flex-wrap gap-3'>
-                    <button
-                      onClick={() => setConsulted(true)}
-                      className='rounded-lg bg-emerald-600 px-4 py-2 text-white font-semibold hover:bg-emerald-700'
-                    >
-                      Tôi đã liên hệ xong
-                    </button>
-                    <button
-                      onClick={() => setShowConsult(false)}
-                      className='rounded-lg border px-4 py-2 text-sm hover:bg-gray-50'
-                    >
-                      Đóng
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className='text-center'>
-                  <div className='mx-auto mb-2 grid h-12 w-12 place-items-center rounded-full bg-emerald-100 text-2xl text-emerald-600'>
-                    ✓
-                  </div>
-                  <p className='text-sm text-gray-600'>
-                    Sau khi trao đổi thành công với nhân viên, vui lòng đăng ký thông tin để chúng tôi tạo tài khoản dự
-                    án cho bạn.
-                  </p>
-                  <div className='mt-4 flex justify-center gap-3'>
-                    <Link
-                      to={path.register}
-                      className='bg-orange-500 text-white px-6 py-3 rounded-md font-semibold hover:bg-orange-600 transition'
-                    >
-                      Đăng ký thông tin
-                    </Link>
-                    <button
-                      onClick={() => setShowConsult(false)}
-                      className='rounded-lg border px-4 py-2 text-sm hover:bg-gray-50'
-                    >
-                      Đóng
-                    </button>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </main>
   )
 }

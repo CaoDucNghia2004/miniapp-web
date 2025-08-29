@@ -35,12 +35,7 @@ export const schema = yup.object({
     .required('Tên công ty là bắt buộc')
     .min(2, 'Tên công ty tối thiểu 2 ký tự')
     .max(160, 'Tên công ty tối đa 160 ký tự'),
-  companyAddress: yup
-    .string()
-    .trim()
-    .required('Địa chỉ công ty là bắt buộc')
-    .min(5, 'Địa chỉ tối thiểu 5 ký tự')
-    .max(255, 'Địa chỉ tối đa 255 ký tự'),
+  fieldId: yup.number().typeError('Vui lòng chọn lĩnh vực').required('Ngành nghề là bắt buộc'),
   password: yup
     .string()
     .required('Password là bắt buộc')
