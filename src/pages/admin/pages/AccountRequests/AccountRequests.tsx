@@ -4,6 +4,7 @@ import { EyeInvisibleOutlined, EyeTwoTone, MailOutlined, PhoneOutlined } from '@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import formsApi from 'src/apis/forms.api'
 import type { Form as FormType } from 'src/types/form.type'
+import adminUsersApi from 'src/apis/adminUsers.api'
 import authApi from 'src/apis/auth.api'
 
 export default function AccountRequests() {
@@ -13,6 +14,8 @@ export default function AccountRequests() {
   const [form] = Form.useForm()
   const [filter, setFilter] = useState<'all' | 'advised' | 'notAdvised'>('all')
   const [search, setSearch] = useState('')
+
+  const [messageApi, contextHolder] = message.useMessage()
 
   const queryClient = useQueryClient()
 
@@ -27,40 +30,41 @@ export default function AccountRequests() {
       queryClient.setQueryData<FormType[]>(['forms'], (old) =>
         old ? old.map((f) => (f.id === id ? { ...f, isAdvised: true } : f)) : old
       )
-      message.success('Đã đánh dấu tư vấn')
+      messageApi.success('Đã đánh dấu tư vấn')
     },
     onError: () => {
-      message.error('Cập nhật thất bại, vui lòng thử lại')
+      messageApi.error('Cập nhật thất bại, vui lòng thử lại')
     }
   })
 
-  // Mutation tạo account & gửi mail
   const createAccountMutation = useMutation({
-    mutationFn: async (body: { email: string; password: string }) => {
-      // Tạo account
-      await authApi.registerAccount(body)
+    mutationFn: async (body: { email: string; password: string; name: string; phone: string; companyName: string }) => {
+      // Tạo user bằng adminUsersApi
+      const res = await adminUsersApi.createUser(body)
 
       // Gửi mail cho khách hàng
-      return authApi.sendAccount({
+      await authApi.sendAccount({
         email: body.email,
         password: body.password,
         loginUrl: 'http://localhost:3000/login'
       })
+
+      return res
     },
-    onSuccess: () => {
-      message.success('Đã tạo tài khoản & gửi mail cho khách hàng')
+    onSuccess: (res) => {
+      messageApi.success(res.data.message || 'Đã tạo tài khoản & gửi mail cho khách hàng')
       setOpenModal(false)
       form.resetFields()
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       const errMsg = error?.response?.data?.message || 'Tạo tài khoản thất bại'
-      form.setFields([
-        {
-          name: 'password',
-          errors: [errMsg]
-        }
-      ])
+      messageApi.error(errMsg) // ✅
+      if (errMsg.toLowerCase().includes('email')) {
+        form.setFields([{ name: 'email', errors: [errMsg] }])
+      } else {
+        form.setFields([{ name: 'password', errors: [errMsg] }])
+      }
     }
   })
 
@@ -165,6 +169,7 @@ export default function AccountRequests() {
 
   return (
     <div>
+      {contextHolder}
       <div className='flex justify-between items-center mb-4'>
         <h2 className='text-2xl font-bold'>Quản lý đăng ký</h2>
         <Space>
@@ -186,7 +191,6 @@ export default function AccountRequests() {
           />
         </Space>
       </div>
-
       <Table<FormType>
         loading={isLoading}
         dataSource={filteredForms}
@@ -196,17 +200,12 @@ export default function AccountRequests() {
         bordered
         rowClassName={(_, index) => (index % 2 === 0 ? 'bg-white' : 'bg-gray-50')}
       />
-
       <Modal title='Tạo tài khoản khách hàng' open={openModal} onCancel={() => setOpenModal(false)} footer={null}>
-        <Form form={form} layout='vertical'>
-          <Form.Item label='Email'>
-            <Input defaultValue={selected?.email} disabled />
+        <Form form={form} layout='vertical' initialValues={{ email: selected?.email }}>
+          <Form.Item label='Email' name='email'>
+            <Input disabled />
           </Form.Item>
-          <Form.Item
-            label='Mật khẩu'
-            name='password'
-            validateTrigger={false} // để không validate mặc định của antd
-          >
+          <Form.Item label='Mật khẩu' name='password' validateTrigger={false}>
             <Input.Password
               value={pwd}
               onChange={(e) => setPwd(e.target.value)}
@@ -220,10 +219,16 @@ export default function AccountRequests() {
               loading={createAccountMutation.isPending}
               onClick={() => {
                 if (!selected) return
-                form.setFields([{ name: 'password', errors: [] }]) // clear lỗi cũ
+                form.setFields([
+                  { name: 'email', errors: [] },
+                  { name: 'password', errors: [] }
+                ]) // clear lỗi cũ
                 createAccountMutation.mutate({
                   email: selected.email,
-                  password: pwd
+                  password: pwd,
+                  name: selected.name,
+                  phone: selected.phone,
+                  companyName: selected.companyName
                 })
               }}
             >
