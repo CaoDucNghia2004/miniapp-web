@@ -17,7 +17,8 @@ const path = {
   forgotPassword: '/forgot-password',
 
   admin: '/admin',
-  adminDashboard: '/admin/dashboard'
+  adminDashboard: '/admin/dashboard',
+  adminFields: '/admin/fields'
 } as const
 
 export default path

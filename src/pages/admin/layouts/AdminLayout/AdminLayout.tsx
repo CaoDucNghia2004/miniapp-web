@@ -44,7 +44,11 @@ export default function AdminLayout() {
             to='/admin/registrations'
             className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}
           >
-            <span>📥</span> Quản lý đăng ký
+            <span>📥</span> Quản lý tài khoản
+          </NavLink>
+
+          <NavLink to={path.adminFields} className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}>
+            <span>🏷️</span> Quản lý lĩnh vực
           </NavLink>
 
           <NavLink to='/admin/quotes' className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}>
