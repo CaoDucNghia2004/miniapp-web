@@ -16,3 +16,18 @@ export function isAxiosUnauthorizedError<UnauthorizedError>(error: unknown): err
 }
 
 export const getAvatarUrl = (avatarName?: string) => (avatarName ? `${config.baseUrl}${avatarName}` : userImage)
+
+export const getProjectStatusLabel = (status: string) => {
+  switch (status) {
+    case 'PENDING':
+      return 'Đang chờ'
+    case 'IN_PROGRESS':
+      return 'Đang thực hiện'
+    case 'COMPLETED':
+      return 'Hoàn thành'
+    case 'CANCELLED':
+      return 'Đã hủy'
+    default:
+      return status
+  }
+}
