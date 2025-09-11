@@ -3,6 +3,7 @@ import config from 'src/constants/config'
 import HttpStatusCode from 'src/constants/httpStatusCode.enum'
 import userImage from 'src/assets/images/avatar/customer1.jpg'
 import type { ProjectPhaseStatus } from 'src/types/projectPhase.type'
+import type { PaymentStatus } from 'src/types/payment.type'
 
 export function isAxiosError<T>(error: unknown): error is AxiosError<T> {
   return axios.isAxiosError(error)
@@ -44,6 +45,19 @@ export const getProjectPhaseStatusLabel = (status: ProjectPhaseStatus) => {
       return 'Đang thực hiện'
     case 'COMPLETED':
       return 'Hoàn thành'
+    default:
+      return status
+  }
+}
+
+export const getPaymentStatusLabel = (status: PaymentStatus) => {
+  switch (status) {
+    case 'PENDING':
+      return '⏳ Đang chờ'
+    case 'COMPLETED':
+      return '✅ Hoàn tất'
+    case 'FAILED':
+      return '❌ Thất bại'
     default:
       return status
   }
