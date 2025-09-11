@@ -1,55 +1,20 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Table, Tag, Button, Modal, Form, Input, DatePicker, Select, message, Descriptions } from 'antd'
+import { Table, Button, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { PlusOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons'
+import dayjs from 'dayjs'
+import { Form } from 'antd'
 import projectsApi from 'src/apis/projects.api'
 import fieldsApi from 'src/apis/fields.api'
 import adminUsersApi from 'src/apis/adminUsers.api'
+import projectPhasesApi from 'src/apis/projectPhases.api'
+import contractsApi from 'src/apis/contracts.api'
 import type { Project } from 'src/types/projects.type'
-import type { Field } from 'src/types/field.type'
-import type { User } from 'src/types/user.type'
-import { getProjectStatusLabel } from 'src/utils/utils'
-import dayjs from 'dayjs'
-import {
-  PlusOutlined,
-  EditOutlined,
-  EyeOutlined,
-  ClockCircleOutlined,
-  SyncOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined
-} from '@ant-design/icons'
-
-const renderStatusTag = (status: Project['status']) => {
-  switch (status) {
-    case 'PENDING':
-      return (
-        <Tag color='orange' icon={<ClockCircleOutlined />}>
-          {getProjectStatusLabel(status)}
-        </Tag>
-      )
-    case 'IN_PROGRESS':
-      return (
-        <Tag color='blue' icon={<SyncOutlined spin />}>
-          {getProjectStatusLabel(status)}
-        </Tag>
-      )
-    case 'COMPLETED':
-      return (
-        <Tag color='green' icon={<CheckCircleOutlined />}>
-          {getProjectStatusLabel(status)}
-        </Tag>
-      )
-    case 'CANCELLED':
-      return (
-        <Tag color='red' icon={<CloseCircleOutlined />}>
-          {getProjectStatusLabel(status)}
-        </Tag>
-      )
-    default:
-      return <Tag>{status}</Tag>
-  }
-}
+import type { ProjectPhase } from 'src/types/projectPhase.type'
+import ProjectStatusTag from '../../components/ProjectStatusTag'
+import ProjectFormModal from '../../components/ProjectFormModal'
+import ProjectDetailModal from '../../components/ProjectDetailModal'
 
 export default function ProjectManagement() {
   const queryClient = useQueryClient()
@@ -57,7 +22,13 @@ export default function ProjectManagement() {
   const [openDetailModal, setOpenDetailModal] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+
   const [form] = Form.useForm()
+  const [phaseForm] = Form.useForm()
+  const [contractForm] = Form.useForm()
+
+  const [editingPhase, setEditingPhase] = useState<ProjectPhase | null>(null)
+  const [step, setStep] = useState(0)
   const [messageApi, contextHolder] = message.useMessage()
 
   const { data, isLoading } = useQuery({
@@ -75,16 +46,34 @@ export default function ProjectManagement() {
     queryFn: () => adminUsersApi.getAllUsers().then((res) => res.data.data)
   })
 
+  const { data: phases } = useQuery({
+    queryKey: ['project-phases', selectedProject?.id],
+    queryFn: () =>
+      selectedProject
+        ? projectPhasesApi.getProjectPhasesByProjectId(selectedProject.id).then((res) => res.data.data)
+        : [],
+    enabled: !!selectedProject
+  })
+
+  const { data: contracts } = useQuery({
+    queryKey: ['contracts', selectedProject?.id],
+    queryFn: () =>
+      selectedProject ? contractsApi.getContractsByProject(selectedProject.id).then((res) => res.data.data) : [],
+    enabled: !!selectedProject
+  })
+
+  // Mutations
   const createMutation = useMutation({
     mutationFn: projectsApi.createProject,
     onSuccess: (res) => {
       messageApi.success(res.data.message || 'Tạo dự án thành công')
       queryClient.invalidateQueries({ queryKey: ['projects'] })
-      setOpenModal(false)
-      form.resetFields()
+      setStep(1)
+      setSelectedProject(res.data.data)
     },
-    onError: () => {
-      messageApi.error('Tạo dự án thất bại')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      messageApi.error(err.response?.data?.message || 'Tạo dự án thất bại')
     }
   })
 
@@ -93,34 +82,132 @@ export default function ProjectManagement() {
     onSuccess: (res) => {
       messageApi.success(res.data.message || 'Cập nhật dự án thành công')
       queryClient.invalidateQueries({ queryKey: ['projects'] })
-      setOpenModal(false)
-      form.resetFields()
+      setSelectedProject(res.data.data)
+      setStep(1)
     },
-    onError: () => {
-      messageApi.error('Cập nhật dự án thất bại')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      messageApi.error(err.response?.data?.message || 'Cập nhật dự án thất bại')
     }
   })
 
-  const handleSubmit = (values: {
-    name: string
-    description: string
-    startDate: dayjs.Dayjs
-    endDate: dayjs.Dayjs
-    fieldId: number
-    userId: number
-    status: Project['status']
-  }) => {
+  const createPhaseMutation = useMutation({
+    mutationFn: projectPhasesApi.createProjectPhase,
+    onSuccess: (res) => {
+      messageApi.success(res.data.message || 'Thêm giai đoạn thành công')
+      queryClient.invalidateQueries({ queryKey: ['project-phases', selectedProject?.id] })
+      phaseForm.resetFields()
+      setEditingPhase(null)
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      messageApi.error(err.response?.data?.message || 'Thêm giai đoạn thất bại')
+    }
+  })
+
+  const updatePhaseMutation = useMutation({
+    mutationFn: projectPhasesApi.updateProjectPhase,
+    onSuccess: (res) => {
+      messageApi.success(res.data.message || 'Cập nhật giai đoạn thành công')
+      queryClient.invalidateQueries({ queryKey: ['project-phases', selectedProject?.id] })
+      phaseForm.resetFields()
+      setEditingPhase(null)
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      messageApi.error(err.response?.data?.message || 'Cập nhật giai đoạn thất bại')
+    }
+  })
+
+  const createContractMutation = useMutation({
+    mutationFn: contractsApi.createContract,
+    onSuccess: (res) => {
+      messageApi.success(res.data.message || 'Tạo hợp đồng thành công')
+      queryClient.invalidateQueries({ queryKey: ['contracts', selectedProject?.id] })
+      contractForm.resetFields()
+      setOpenModal(false)
+      setStep(0)
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      messageApi.error(err.response?.data?.message || 'Tạo hợp đồng thất bại')
+    }
+  })
+
+  const updateContractMutation = useMutation({
+    mutationFn: contractsApi.updateContract,
+    onSuccess: (res) => {
+      messageApi.success(res.data.message || 'Cập nhật hợp đồng thành công')
+      queryClient.invalidateQueries({ queryKey: ['contracts', selectedProject?.id] })
+      contractForm.resetFields()
+      setOpenModal(false)
+      setStep(0)
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      messageApi.error(err.response?.data?.message || 'Cập nhật hợp đồng thất bại')
+    }
+  })
+
+  // Handlers
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmitProject = (values: any) => {
     const payload = {
       ...values,
       startDate: values.startDate.format('YYYY-MM-DD'),
       endDate: values.endDate.format('YYYY-MM-DD')
     }
-
     if (editingProject) {
       updateMutation.mutate({ ...payload, id: editingProject.id })
     } else {
       createMutation.mutate(payload)
     }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmitPhase = (values: any) => {
+    if (!selectedProject) return
+    const payload = {
+      ...values,
+      projectId: selectedProject.id,
+      startDate: values.startDate.format('YYYY-MM-DD'),
+      endDate: values.endDate.format('YYYY-MM-DD')
+    }
+    if (editingPhase) {
+      updatePhaseMutation.mutate({ ...payload, id: editingPhase.id })
+    } else {
+      createPhaseMutation.mutate(payload)
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmitContract = (values: any) => {
+    if (!selectedProject) return
+    const payload = {
+      contractNumber: values.contractNumber,
+      contractFile: values.contractFile, // lúc này là string URL do upload trả về
+      totalAmount: phases?.reduce((acc, p) => acc + p.amountDue, 0) || 0,
+      projectId: selectedProject.id,
+      signedDate: null
+    }
+
+    if (contracts && contracts.length > 0) {
+      updateContractMutation.mutate({ ...payload, id: contracts[0].id })
+    } else {
+      createContractMutation.mutate(payload)
+    }
+  }
+
+  const handleDeletePhase = (id: number) => {
+    projectPhasesApi.deleteProjectPhase(id).then(() => {
+      queryClient.invalidateQueries({ queryKey: ['project-phases', selectedProject?.id] })
+    })
+  }
+
+  const handleDeleteContract = (id: number) => {
+    contractsApi.deleteContract(id).then(() => {
+      queryClient.invalidateQueries({ queryKey: ['contracts', selectedProject?.id] })
+    })
   }
 
   const columns: ColumnsType<Project> = [
@@ -143,7 +230,7 @@ export default function ProjectManagement() {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      render: (status: Project['status']) => renderStatusTag(status)
+      render: (status: Project['status']) => <ProjectStatusTag status={status} />
     },
     {
       title: 'Thao tác',
@@ -165,7 +252,9 @@ export default function ProjectManagement() {
             icon={<EditOutlined />}
             onClick={() => {
               setEditingProject(record)
+              setSelectedProject(record)
               setOpenModal(true)
+              setStep(0)
               form.setFieldsValue({
                 ...record,
                 startDate: dayjs(record.startDate),
@@ -196,6 +285,7 @@ export default function ProjectManagement() {
             setEditingProject(null)
             setOpenModal(true)
             form.resetFields()
+            setStep(0)
           }}
         >
           Thêm dự án
@@ -207,93 +297,43 @@ export default function ProjectManagement() {
         loading={isLoading}
         dataSource={(data || []).sort((a, b) => b.id - a.id)}
         columns={columns}
-        bordered
         pagination={{ pageSize: 5 }}
       />
 
-      <Modal
-        title={editingProject ? 'Cập nhật dự án' : 'Thêm dự án'}
+      <ProjectFormModal
         open={openModal}
-        onCancel={() => {
+        onClose={() => {
           setOpenModal(false)
           form.resetFields()
+          setStep(0)
         }}
-        onOk={() => form.submit()}
-        confirmLoading={createMutation.isPending || updateMutation.isPending}
-      >
-        <Form form={form} layout='vertical' onFinish={handleSubmit}>
-          <Form.Item label='Tên dự án' name='name' rules={[{ required: true, message: 'Nhập tên dự án' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label='Mô tả' name='description'>
-            <Input.TextArea rows={3} />
-          </Form.Item>
-          <Form.Item label='Ngày bắt đầu' name='startDate' rules={[{ required: true }]}>
-            <DatePicker format='DD/MM/YYYY' />
-          </Form.Item>
-          <Form.Item label='Ngày kết thúc' name='endDate' rules={[{ required: true }]}>
-            <DatePicker format='DD/MM/YYYY' />
-          </Form.Item>
-          <Form.Item label='Lĩnh vực' name='fieldId' rules={[{ required: true }]}>
-            <Select
-              options={(fields || []).map((f: Field) => ({
-                label: f.fieldName,
-                value: f.id
-              }))}
-            />
-          </Form.Item>
-          <Form.Item label='Khách hàng' name='userId' rules={[{ required: true }]}>
-            <Select
-              showSearch
-              options={(users || []).map((u: User) => ({
-                label: `${u.name || 'Chưa có tên'} - ${u.email}`,
-                value: u.id
-              }))}
-            />
-          </Form.Item>
-          <Form.Item label='Trạng thái' name='status' rules={[{ required: true }]}>
-            <Select
-              options={[
-                { label: 'Đang chờ', value: 'PENDING' },
-                { label: 'Đang thực hiện', value: 'IN_PROGRESS' },
-                { label: 'Hoàn thành', value: 'COMPLETED' },
-                { label: 'Đã hủy', value: 'CANCELLED' }
-              ]}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
+        step={step}
+        setStep={setStep}
+        form={form}
+        phaseForm={phaseForm}
+        contractForm={contractForm}
+        fields={fields}
+        users={users}
+        selectedProject={selectedProject}
+        editingProject={editingProject}
+        editingPhase={editingPhase}
+        setEditingPhase={setEditingPhase}
+        phases={phases}
+        contracts={contracts}
+        handleSubmitProject={handleSubmitProject}
+        handleSubmitPhase={handleSubmitPhase}
+        handleSubmitContract={handleSubmitContract}
+        onDeletePhase={handleDeletePhase}
+      />
 
-      <Modal title='Chi tiết dự án' open={openDetailModal} onCancel={() => setOpenDetailModal(false)} footer={null}>
-        {selectedProject && (
-          <Descriptions column={1} bordered size='small'>
-            <Descriptions.Item label='ID'>{selectedProject.id}</Descriptions.Item>
-            <Descriptions.Item label='Tên dự án'>{selectedProject.name}</Descriptions.Item>
-            <Descriptions.Item label='Mô tả'>{selectedProject.description}</Descriptions.Item>
-            <Descriptions.Item label='Ngày bắt đầu'>
-              {new Date(selectedProject.startDate).toLocaleDateString('vi-VN')}
-            </Descriptions.Item>
-            <Descriptions.Item label='Ngày kết thúc'>
-              {new Date(selectedProject.endDate).toLocaleDateString('vi-VN')}
-            </Descriptions.Item>
-            <Descriptions.Item label='Trạng thái'>{renderStatusTag(selectedProject.status)}</Descriptions.Item>
-            <Descriptions.Item label='Người tạo'>{selectedProject.createdBy}</Descriptions.Item>
-            <Descriptions.Item label='Ngày tạo'>
-              {new Date(selectedProject.createdAt).toLocaleDateString('vi-VN')}
-            </Descriptions.Item>
-            {selectedProject.updatedBy && (
-              <Descriptions.Item label='Người cập nhật'>{selectedProject.updatedBy}</Descriptions.Item>
-            )}
-            {selectedProject.updatedAt && (
-              <Descriptions.Item label='Ngày cập nhật'>
-                {new Date(selectedProject.updatedAt).toLocaleDateString('vi-VN')}
-              </Descriptions.Item>
-            )}
-            <Descriptions.Item label='Đánh giá'>{selectedProject.rating ?? '-'}</Descriptions.Item>
-            <Descriptions.Item label='Nhận xét'>{selectedProject.review ?? '-'}</Descriptions.Item>
-          </Descriptions>
-        )}
-      </Modal>
+      <ProjectDetailModal
+        open={openDetailModal}
+        onClose={() => setOpenDetailModal(false)}
+        project={selectedProject}
+        phases={phases}
+        contracts={contracts}
+        onDeleteContract={handleDeleteContract}
+      />
     </div>
   )
 }
