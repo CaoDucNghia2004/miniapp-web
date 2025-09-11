@@ -4,7 +4,7 @@ import http from 'src/utils/http'
 
 const paymentsApi = {
   getPaymentsByProjectId(projectId: number) {
-    return http.get<SuccessResponse<Payment[]>>(`/payments/project/${projectId}`)
+    return http.get<SuccessResponse<Payment[]>>(`/api/v1/payments/project/${projectId}`)
   },
   createPayment(payload: CreatePaymentDto) {
     return http.post<SuccessResponse<Payment>>('/api/v1/payments', payload)
@@ -15,7 +15,7 @@ const paymentsApi = {
   },
 
   deletePayment(paymentId: number) {
-    return http.delete<SuccessResponse<null>>(`/payments/${paymentId}`)
+    return http.delete<SuccessResponse<null>>(`/api/v1/payments/${paymentId}`)
   }
 }
 
