@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Table, Input, Space } from 'antd'
-import { SearchOutlined } from '@ant-design/icons'
+import { Table, Input, Space, Card } from 'antd'
+import { SearchOutlined, TeamOutlined } from '@ant-design/icons'
 import adminUsersApi from 'src/apis/adminUsers.api'
 import type { User } from 'src/types/user.type'
 
@@ -45,29 +45,35 @@ export default function CustomerManagement() {
     )
 
   return (
-    <div>
-      <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-xl font-bold'>Quản lý khách hàng</h2>
-        <Space>
-          <Input.Search
-            placeholder='Tìm kiếm khách hàng...'
-            allowClear
-            onSearch={(value) => setSearch(value)}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ width: 250 }}
-            prefix={<SearchOutlined />}
-          />
-        </Space>
-      </div>
-
-      <Table<User>
-        loading={isLoading}
-        rowKey='id'
-        dataSource={filteredData}
-        columns={columns}
-        bordered
-        pagination={{ pageSize: 5 }}
-      />
+    <div className='space-y-4'>
+      <Card
+        title={
+          <span className='text-xl font-bold flex items-center gap-2'>
+            <TeamOutlined /> Quản lý khách hàng
+          </span>
+        }
+        extra={
+          <Space>
+            <Input.Search
+              placeholder='Tìm kiếm khách hàng...'
+              allowClear
+              onSearch={(value) => setSearch(value)}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ width: 250 }}
+              prefix={<SearchOutlined />}
+            />
+          </Space>
+        }
+      >
+        <Table<User>
+          loading={isLoading}
+          rowKey='id'
+          dataSource={filteredData}
+          columns={columns}
+          bordered
+          pagination={{ pageSize: 5 }}
+        />
+      </Card>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Table, Tag, Button, Input, Modal, Form, Space, message, Select } from 'antd'
-import { EyeInvisibleOutlined, EyeTwoTone, MailOutlined, PhoneOutlined } from '@ant-design/icons'
+import { Table, Tag, Button, Input, Modal, Form, Space, message, Select, Card } from 'antd'
+import { EyeInvisibleOutlined, EyeTwoTone, MailOutlined, PhoneOutlined, UserAddOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import formsApi from 'src/apis/forms.api'
 import type { Form as FormType } from 'src/types/form.type'
@@ -59,7 +59,7 @@ export default function AccountRequests() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       const errMsg = error?.response?.data?.message || 'Tạo tài khoản thất bại'
-      messageApi.error(errMsg) // ✅
+      messageApi.error(errMsg)
       if (errMsg.toLowerCase().includes('email')) {
         form.setFields([{ name: 'email', errors: [errMsg] }])
       } else {
@@ -168,38 +168,46 @@ export default function AccountRequests() {
     .sort((a, b) => b.id - a.id)
 
   return (
-    <div>
+    <div className='space-y-4'>
       {contextHolder}
-      <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-2xl font-bold'>Quản lý đăng ký</h2>
-        <Space>
-          <Input.Search
-            placeholder='Tìm tên, email, công ty, SĐT...'
-            onSearch={(val) => setSearch(val)}
-            allowClear
-            style={{ width: 250 }}
-          />
-          <Select
-            value={filter}
-            onChange={(val) => setFilter(val)}
-            style={{ width: 180 }}
-            options={[
-              { label: 'Tất cả', value: 'all' },
-              { label: 'Đã tư vấn', value: 'advised' },
-              { label: 'Chưa tư vấn', value: 'notAdvised' }
-            ]}
-          />
-        </Space>
-      </div>
-      <Table<FormType>
-        loading={isLoading}
-        dataSource={filteredForms}
-        columns={columns}
-        rowKey='id'
-        pagination={{ pageSize: 5 }}
-        bordered
-        rowClassName={(_, index) => (index % 2 === 0 ? 'bg-white' : 'bg-gray-50')}
-      />
+      <Card
+        title={
+          <span className='text-xl font-bold flex items-center gap-2'>
+            <UserAddOutlined /> Quản lý đăng ký
+          </span>
+        }
+        extra={
+          <Space>
+            <Input.Search
+              placeholder='Tìm tên, email, công ty, SĐT...'
+              onSearch={(val) => setSearch(val)}
+              allowClear
+              style={{ width: 250 }}
+            />
+            <Select
+              value={filter}
+              onChange={(val) => setFilter(val)}
+              style={{ width: 180 }}
+              options={[
+                { label: 'Tất cả', value: 'all' },
+                { label: 'Đã tư vấn', value: 'advised' },
+                { label: 'Chưa tư vấn', value: 'notAdvised' }
+              ]}
+            />
+          </Space>
+        }
+      >
+        <Table<FormType>
+          loading={isLoading}
+          dataSource={filteredForms}
+          columns={columns}
+          rowKey='id'
+          pagination={{ pageSize: 5 }}
+          bordered
+          rowClassName={(_, index) => (index % 2 === 0 ? 'bg-white' : 'bg-gray-50')}
+        />
+      </Card>
+
       <Modal title='Tạo tài khoản khách hàng' open={openModal} onCancel={() => setOpenModal(false)} footer={null}>
         <Form form={form} layout='vertical' initialValues={{ email: selected?.email }}>
           <Form.Item label='Email' name='email'>

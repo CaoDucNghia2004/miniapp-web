@@ -267,7 +267,7 @@ export default function PaymentManagement() {
         extra={
           <Space>
             <span className='font-medium flex items-center gap-1'>
-              <FilterOutlined /> 📂 Lọc theo trạng thái:
+              <FilterOutlined /> Lọc theo trạng thái:
             </span>
             <Select
               value={statusFilter || 'ALL'}

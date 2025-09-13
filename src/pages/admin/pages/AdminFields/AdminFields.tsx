@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Table, Button, Modal, Form, Input, Space, Popconfirm } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
+import { Table, Button, Modal, Form, Input, Space, Popconfirm, Card, message } from 'antd'
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, AppstoreAddOutlined } from '@ant-design/icons'
 import fieldsApi from 'src/apis/fields.api'
 import type { Field } from 'src/types/field.type'
-import { message } from 'antd'
 
 export default function AdminFields() {
   const queryClient = useQueryClient()
@@ -13,7 +12,6 @@ export default function AdminFields() {
   const [search, setSearch] = useState('')
   const [form] = Form.useForm()
 
-  // AntD v5: hook để hiển thị message
   const [messageApi, contextHolder] = message.useMessage()
 
   const { data, isLoading } = useQuery({
@@ -105,47 +103,53 @@ export default function AdminFields() {
     .filter((f) => f.fieldName.toLowerCase().includes(search.toLowerCase()))
 
   return (
-    <div>
-      {/* 👇 cái này bắt buộc để render message */}
+    <div className='space-y-4'>
       {contextHolder}
 
-      <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-2xl font-bold'>Quản lý lĩnh vực</h2>
-        <Space>
-          <Input.Search
-            placeholder='Tìm kiếm lĩnh vực...'
-            allowClear
-            onSearch={(value) => setSearch(value)}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ width: 250 }}
-            prefix={<SearchOutlined />}
-          />
-          <Button
-            type='primary'
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setEditing(null)
-              setOpen(true)
-              form.resetFields()
-            }}
-          >
-            Thêm lĩnh vực
-          </Button>
-        </Space>
-      </div>
-
-      <Table<Field>
-        loading={isLoading}
-        rowKey='id'
-        dataSource={filteredData}
-        columns={columns}
-        bordered
-        pagination={{ pageSize: 5 }}
-      />
+      <Card
+        title={
+          <span className='text-xl font-bold flex items-center gap-2'>
+            <AppstoreAddOutlined /> Quản lý lĩnh vực
+          </span>
+        }
+        extra={
+          <Space>
+            <Input.Search
+              placeholder='Tìm kiếm lĩnh vực...'
+              allowClear
+              onSearch={(value) => setSearch(value)}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ width: 250 }}
+              prefix={<SearchOutlined />}
+            />
+            <Button
+              type='primary'
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setEditing(null)
+                setOpen(true)
+                form.resetFields()
+              }}
+            >
+              Thêm lĩnh vực
+            </Button>
+          </Space>
+        }
+      >
+        <Table<Field>
+          loading={isLoading}
+          rowKey='id'
+          dataSource={filteredData}
+          columns={columns}
+          bordered
+          pagination={{ pageSize: 5 }}
+          rowClassName={(_, index) => (index % 2 === 0 ? 'bg-white' : 'bg-gray-50')}
+        />
+      </Card>
 
       <Modal
         open={open}
-        title={editing ? 'Sửa lĩnh vực' : 'Thêm lĩnh vực'}
+        title={editing ? '✏️ Sửa lĩnh vực' : '➕ Thêm lĩnh vực'}
         onCancel={() => {
           setOpen(false)
           setEditing(null)
@@ -153,7 +157,7 @@ export default function AdminFields() {
         onOk={() => form.submit()}
         okText='Lưu'
         cancelText='Hủy'
-        destroyOnHidden
+        style={{ borderRadius: 12 }}
       >
         <Form
           form={form}
@@ -176,10 +180,10 @@ export default function AdminFields() {
             name='fieldName'
             rules={[{ required: true, message: 'Vui lòng nhập tên lĩnh vực' }]}
           >
-            <Input />
+            <Input placeholder='Nhập tên lĩnh vực...' />
           </Form.Item>
           <Form.Item label='Mô tả' name='description'>
-            <Input.TextArea rows={3} />
+            <Input.TextArea rows={3} placeholder='Nhập mô tả (không bắt buộc)' />
           </Form.Item>
         </Form>
       </Modal>
