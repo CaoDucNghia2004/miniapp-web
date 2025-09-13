@@ -1,5 +1,18 @@
 import { useEffect } from 'react'
-import { Modal, Form, Input, DatePicker, Select, Button, Steps, Timeline, Popconfirm, Card, Divider } from 'antd'
+import {
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  Select,
+  Button,
+  Steps,
+  Timeline,
+  Popconfirm,
+  Card,
+  Divider,
+  message
+} from 'antd'
 import { FileAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import type { Field } from 'src/types/field.type'
@@ -59,15 +72,58 @@ export default function ProjectFormModal({
   handleSubmitContract,
   onDeletePhase
 }: ProjectFormModalProps) {
+  const [messageApi, contextHolder] = message.useMessage()
+
   useEffect(() => {
     if (open && contracts && contracts.length > 0) {
       const c = contracts[0]
       contractForm.setFieldsValue({
         contractNumber: c.contractNumber,
-        contractFile: c.contractFile
+        contractFile: c.contractFile,
+        signedDate: c.signedDate ? dayjs(c.signedDate) : null
       })
     }
   }, [open, contracts, contractForm])
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmitProject = (values: any) => {
+    if (phases && phases.length > 0) {
+      if (values.status === 'PENDING') {
+        const invalid = phases.some((p) => p.status !== 'PENDING')
+        if (invalid) {
+          messageApi.error('Không thể đặt dự án ở trạng thái "Đang chờ" khi có giai đoạn không phải Đang chờ.')
+          return
+        }
+      }
+      if (values.status === 'COMPLETED') {
+        const invalid = phases.some((p) => p.status !== 'COMPLETED')
+        if (invalid) {
+          messageApi.error('Tất cả giai đoạn phải "Hoàn thành" trước khi dự án có thể đánh dấu là Hoàn thành.')
+          return
+        }
+      }
+    }
+    handleSubmitProject(values)
+  }
+
+  // ✅ validate khi submit Phase (Step 1)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmitPhase = (values: any) => {
+    if (!selectedProject) return
+    const projectStatus = selectedProject.status
+    const phaseStatus = values.status
+
+    if (projectStatus === 'PENDING' && phaseStatus !== 'PENDING') {
+      messageApi.error('Giai đoạn không hợp lệ: Dự án đang "Đang chờ" → giai đoạn chỉ được phép "Đang chờ".')
+      return
+    }
+    if (projectStatus === 'COMPLETED' && phaseStatus !== 'COMPLETED') {
+      messageApi.error('Giai đoạn không hợp lệ: Dự án đã "Hoàn thành" → giai đoạn bắt buộc phải "Hoàn thành".')
+      return
+    }
+    // CANCELLED thì cho phép mọi trạng thái
+    handleSubmitPhase(values)
+  }
 
   return (
     <Modal
@@ -77,27 +133,28 @@ export default function ProjectFormModal({
       footer={null}
       width={800}
     >
+      {contextHolder}
       <Steps current={step} items={[{ title: 'Dự án' }, { title: 'Giai đoạn' }, { title: 'Hợp đồng' }]} />
 
       {/* Step 0 - Project */}
       {step === 0 && (
-        <Form form={form} layout='vertical' onFinish={handleSubmitProject} className='mt-4'>
-          <Form.Item label='Tên dự án' name='name' rules={[{ required: true, message: 'Nhập tên dự án' }]}>
+        <Form form={form} layout='vertical' onFinish={onSubmitProject} className='mt-4'>
+          <Form.Item label='Tên dự án' name='name' rules={[{ required: true, message: 'Vui lòng nhập tên dự án' }]}>
             <Input />
           </Form.Item>
           <Form.Item label='Mô tả' name='description'>
             <Input.TextArea rows={3} />
           </Form.Item>
-          <Form.Item label='Ngày bắt đầu' name='startDate' rules={[{ required: true }]}>
+          <Form.Item label='Ngày bắt đầu' name='startDate' rules={[{ required: true, message: 'Chọn ngày bắt đầu' }]}>
             <DatePicker format='DD/MM/YYYY' />
           </Form.Item>
-          <Form.Item label='Ngày kết thúc' name='endDate' rules={[{ required: true }]}>
+          <Form.Item label='Ngày kết thúc' name='endDate' rules={[{ required: true, message: 'Chọn ngày kết thúc' }]}>
             <DatePicker format='DD/MM/YYYY' />
           </Form.Item>
-          <Form.Item label='Lĩnh vực' name='fieldId' rules={[{ required: true }]}>
+          <Form.Item label='Lĩnh vực' name='fieldId' rules={[{ required: true, message: 'Chọn lĩnh vực' }]}>
             <Select options={(fields || []).map((f) => ({ label: f.fieldName, value: f.id }))} />
           </Form.Item>
-          <Form.Item label='Khách hàng' name='userId' rules={[{ required: true }]}>
+          <Form.Item label='Khách hàng' name='userId' rules={[{ required: true, message: 'Chọn khách hàng' }]}>
             <Select
               showSearch
               options={(users || []).map((u) => ({
@@ -106,7 +163,7 @@ export default function ProjectFormModal({
               }))}
             />
           </Form.Item>
-          <Form.Item label='Trạng thái' name='status' rules={[{ required: true }]}>
+          <Form.Item label='Trạng thái' name='status' rules={[{ required: true, message: 'Chọn trạng thái dự án' }]}>
             <Select
               options={[
                 { label: 'Đang chờ', value: 'PENDING' },
@@ -125,32 +182,72 @@ export default function ProjectFormModal({
       {/* Step 1 - Phases */}
       {step === 1 && selectedProject && (
         <div className='mt-4'>
-          <Form form={phaseForm} layout='vertical' onFinish={handleSubmitPhase}>
-            <Form.Item label='Tên giai đoạn' name='phaseName' rules={[{ required: true }]} hasFeedback>
+          <Form form={phaseForm} layout='vertical' onFinish={onSubmitPhase}>
+            <Form.Item
+              label='Tên giai đoạn'
+              name='phaseName'
+              rules={[{ required: true, message: 'Nhập tên giai đoạn' }]}
+              hasFeedback
+            >
               <Input placeholder='Nhập tên giai đoạn...' />
             </Form.Item>
             <Form.Item label='Mô tả' name='description'>
               <Input.TextArea rows={2} placeholder='Mô tả chi tiết giai đoạn...' />
             </Form.Item>
             <div className='grid grid-cols-2 gap-4'>
-              <Form.Item label='Ngày bắt đầu' name='startDate' rules={[{ required: true }]} hasFeedback>
+              <Form.Item
+                label='Ngày bắt đầu'
+                name='startDate'
+                rules={[{ required: true, message: 'Chọn ngày bắt đầu' }]}
+                hasFeedback
+              >
                 <DatePicker format='DD/MM/YYYY' className='w-full' />
               </Form.Item>
-              <Form.Item label='Ngày kết thúc' name='endDate' rules={[{ required: true }]} hasFeedback>
+              <Form.Item
+                label='Ngày kết thúc'
+                name='endDate'
+                rules={[{ required: true, message: 'Chọn ngày kết thúc' }]}
+                hasFeedback
+              >
                 <DatePicker format='DD/MM/YYYY' className='w-full' />
               </Form.Item>
             </div>
-            <Form.Item label='Trạng thái' name='status' rules={[{ required: true }]} hasFeedback>
+            <Form.Item
+              label='Trạng thái'
+              name='status'
+              rules={[{ required: true, message: 'Chọn trạng thái giai đoạn' }]}
+              hasFeedback
+            >
               <Select
                 placeholder='Chọn trạng thái'
                 options={[
-                  { label: '⏳ Đang chờ', value: 'PENDING' },
-                  { label: '🚀 Đang thực hiện', value: 'IN_PROGRESS' },
-                  { label: '✅ Hoàn thành', value: 'COMPLETED' }
+                  {
+                    label: '⏳ Đang chờ',
+                    value: 'PENDING',
+                    disabled:
+                      selectedProject.status !== 'PENDING' &&
+                      selectedProject.status !== 'IN_PROGRESS' &&
+                      selectedProject.status !== 'CANCELLED'
+                  },
+                  {
+                    label: '🚀 Đang thực hiện',
+                    value: 'IN_PROGRESS',
+                    disabled: selectedProject.status !== 'IN_PROGRESS' && selectedProject.status !== 'CANCELLED'
+                  },
+                  {
+                    label: '✅ Hoàn thành',
+                    value: 'COMPLETED',
+                    disabled: selectedProject.status === 'PENDING'
+                  }
                 ]}
               />
             </Form.Item>
-            <Form.Item label='Số tiền' name='amountDue' rules={[{ required: true }]} hasFeedback>
+            <Form.Item
+              label='Số tiền'
+              name='amountDue'
+              rules={[{ required: true, message: 'Nhập số tiền' }]}
+              hasFeedback
+            >
               <Input type='number' placeholder='Nhập số tiền...' />
             </Form.Item>
 
@@ -234,7 +331,11 @@ export default function ProjectFormModal({
       {step === 2 && selectedProject && (
         <div className='mt-4'>
           <Form form={contractForm} layout='vertical' onFinish={handleSubmitContract}>
-            <Form.Item label='Số hợp đồng' name='contractNumber' rules={[{ required: true }]}>
+            <Form.Item
+              label='Số hợp đồng'
+              name='contractNumber'
+              rules={[{ required: true, message: 'Nhập số hợp đồng' }]}
+            >
               <Input />
             </Form.Item>
 
@@ -243,6 +344,15 @@ export default function ProjectFormModal({
                 value={(phases || []).reduce((acc, p) => acc + (p.amountDue || 0), 0).toLocaleString() + ' VND'}
                 disabled
               />
+            </Form.Item>
+
+            {/* Ngày ký hợp đồng */}
+            <Form.Item
+              label='Ngày ký hợp đồng'
+              name='signedDate'
+              rules={[{ required: true, message: 'Chọn ngày ký hợp đồng' }]}
+            >
+              <DatePicker format='DD/MM/YYYY' className='w-full' />
             </Form.Item>
 
             <Form.Item name='contractFile' hidden>
@@ -263,8 +373,6 @@ export default function ProjectFormModal({
                       {contracts[0].contractFile.split('/').pop()}
                     </a>
                   </p>
-
-                  {/* input file có style đẹp */}
                   <label className='inline-flex items-center px-3 py-2 bg-gray-100 border rounded cursor-pointer hover:bg-gray-200'>
                     📂
                     <input

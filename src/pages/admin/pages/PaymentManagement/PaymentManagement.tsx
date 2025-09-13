@@ -185,11 +185,13 @@ export default function PaymentManagement() {
           <Button
             type='primary'
             icon={<EditOutlined />}
+            disabled={record.status === 'CANCELLED'}
             onClick={() => {
               setSelectedProject(record)
               setSelectedPhase(null)
               setCurrentPayment(null)
               form.resetFields()
+              form.setFieldValue('projectId', record.id)
               setOpenModal(true)
             }}
           >
@@ -220,6 +222,11 @@ export default function PaymentManagement() {
       paymentDate: values.paymentDate.format('YYYY-MM-DD'),
       paymentStatus: values.paymentStatus,
       transactionId: values.transactionId
+    }
+
+    if (selectedProject?.status === 'CANCELLED') {
+      messageApi.error('❌ Dự án đã hủy, không thể tạo thanh toán')
+      return
     }
 
     if (currentPayment) {

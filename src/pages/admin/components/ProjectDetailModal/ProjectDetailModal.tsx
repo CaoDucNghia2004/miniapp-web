@@ -3,6 +3,7 @@ import { DeleteOutlined, FilePdfOutlined } from '@ant-design/icons'
 import type { Project } from 'src/types/projects.type'
 import type { ProjectPhase } from 'src/types/projectPhase.type'
 import type { Contract } from 'src/types/contract.type'
+import type { Payment } from 'src/types/payment.type'
 import ProjectStatusTag from '../ProjectStatusTag'
 import { getContractUrl, getProjectPhaseStatusLabel } from 'src/utils/utils'
 
@@ -12,6 +13,7 @@ interface ProjectDetailModalProps {
   project: Project | null
   phases?: ProjectPhase[]
   contracts?: Contract[]
+  payments?: Payment[]
   onDeleteContract: (id: number) => void
 }
 
@@ -21,6 +23,7 @@ export default function ProjectDetailModal({
   project,
   phases,
   contracts,
+  payments = [],
   onDeleteContract
 }: ProjectDetailModalProps) {
   return (
@@ -54,31 +57,59 @@ export default function ProjectDetailModal({
             {phases && phases.length > 0 ? (
               <Timeline
                 mode='left'
-                items={phases.map((p) => ({
-                  label: (
-                    <Tag color='blue'>
-                      {new Date(p.startDate).toLocaleDateString('vi-VN')} -{' '}
-                      {new Date(p.endDate).toLocaleDateString('vi-VN')}
-                    </Tag>
-                  ),
-                  children: (
-                    <div className='pl-2'>
-                      <p className='font-semibold text-blue-600'>{p.phaseName}</p>
-                      <p className='text-gray-600 text-sm'>{p.description || 'Không có mô tả'}</p>
-                      <p>
-                        <b>Trạng thái:</b>{' '}
-                        <Tag
-                          color={p.status === 'COMPLETED' ? 'green' : p.status === 'IN_PROGRESS' ? 'orange' : 'default'}
-                        >
-                          {getProjectPhaseStatusLabel(p.status)}
-                        </Tag>
-                      </p>
-                      <p>
-                        <b>Số tiền:</b> {p.amountDue.toLocaleString()} VND
-                      </p>
-                    </div>
-                  )
-                }))}
+                items={phases.map((p) => {
+                  const payment = payments.find((pm) => pm.projectPhaseId === p.id)
+                  return {
+                    label: (
+                      <Tag color='blue'>
+                        {new Date(p.startDate).toLocaleDateString('vi-VN')} -{' '}
+                        {new Date(p.endDate).toLocaleDateString('vi-VN')}
+                      </Tag>
+                    ),
+                    children: (
+                      <div className='pl-2'>
+                        <p className='font-semibold text-blue-600'>{p.phaseName}</p>
+                        <p className='text-gray-600 text-sm'>{p.description || 'Không có mô tả'}</p>
+                        <p>
+                          <b>Trạng thái giai đoạn:</b>{' '}
+                          <Tag
+                            color={
+                              p.status === 'COMPLETED' ? 'green' : p.status === 'IN_PROGRESS' ? 'orange' : 'default'
+                            }
+                          >
+                            {getProjectPhaseStatusLabel(p.status)}
+                          </Tag>
+                        </p>
+                        <p>
+                          <b>Số tiền:</b> {p.amountDue.toLocaleString()} VND
+                        </p>
+
+                        <p>
+                          <b>Thanh toán:</b>{' '}
+                          {payment ? (
+                            <Tag
+                              color={
+                                payment.paymentStatus === 'COMPLETED'
+                                  ? 'green'
+                                  : payment.paymentStatus === 'FAILED'
+                                    ? 'red'
+                                    : 'default'
+                              }
+                            >
+                              {payment.paymentStatus === 'COMPLETED'
+                                ? 'Hoàn tất'
+                                : payment.paymentStatus === 'FAILED'
+                                  ? 'Thất bại'
+                                  : 'Đang chờ'}
+                            </Tag>
+                          ) : (
+                            <Tag color='default'>Chưa có</Tag>
+                          )}
+                        </p>
+                      </div>
+                    )
+                  }
+                })}
               />
             ) : (
               <p className='text-gray-500 italic'>Chưa có giai đoạn nào</p>
@@ -98,6 +129,9 @@ export default function ProjectDetailModal({
                     </p>
                     <p>
                       <b>Giá trị:</b> {c.totalAmount?.toLocaleString() || 0} VND
+                    </p>
+                    <p>
+                      <b>Ngày ký:</b> {c.signedDate ? new Date(c.signedDate).toLocaleDateString('vi-VN') : 'Chưa ký'}
                     </p>
                     <p>
                       <b>File:</b>{' '}
