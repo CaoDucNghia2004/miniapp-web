@@ -13,4 +13,5 @@ export type Project = {
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
   userId: number
   fieldId: number
+  contractFile?: string | null
 }

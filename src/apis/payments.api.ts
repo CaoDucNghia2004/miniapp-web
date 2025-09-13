@@ -3,9 +3,15 @@ import type { SuccessResponse } from 'src/types/utils.type'
 import http from 'src/utils/http'
 
 const paymentsApi = {
+  getAllPayments() {
+    return http.get<SuccessResponse<Payment[]>>('/api/v1/payments')
+  },
+
+  // Lấy payments theo projectId
   getPaymentsByProjectId(projectId: number) {
     return http.get<SuccessResponse<Payment[]>>(`/api/v1/payments/project/${projectId}`)
   },
+
   createPayment(payload: CreatePaymentDto) {
     return http.post<SuccessResponse<Payment>>('/api/v1/payments', payload)
   },

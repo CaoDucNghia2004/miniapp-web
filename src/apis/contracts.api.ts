@@ -8,6 +8,8 @@ import type { SuccessResponse } from 'src/types/utils.type'
 import http from 'src/utils/http'
 
 const contractsApi = {
+  getAllContracts: () => http.get<SuccessResponse<Contract[]>>('/api/v1/contracts'),
+
   getContractsByProject: (projectId: number) =>
     http.get<SuccessResponse<Contract[]>>(`/api/v1/contracts/project/${projectId}`),
 

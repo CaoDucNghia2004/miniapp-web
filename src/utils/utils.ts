@@ -53,11 +53,11 @@ export const getProjectPhaseStatusLabel = (status: ProjectPhaseStatus) => {
 export const getPaymentStatusLabel = (status: PaymentStatus) => {
   switch (status) {
     case 'PENDING':
-      return '⏳ Đang chờ'
+      return 'Đang chờ'
     case 'COMPLETED':
-      return '✅ Hoàn tất'
+      return 'Hoàn tất'
     case 'FAILED':
-      return '❌ Thất bại'
+      return 'Thất bại'
     default:
       return status
   }

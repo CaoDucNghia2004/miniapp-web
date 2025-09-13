@@ -3,7 +3,6 @@ export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED'
 export interface Payment {
   id: number
   projectPhaseId: number
-  amount: number
   paymentDate: string
   paymentStatus: PaymentStatus
   transactionId: string
@@ -15,7 +14,6 @@ export interface Payment {
 
 export interface CreatePaymentDto {
   projectPhaseId: number
-  amount: number
   paymentDate: string
   paymentStatus: PaymentStatus
   transactionId: string
@@ -24,7 +22,6 @@ export interface CreatePaymentDto {
 export interface UpdatePaymentDto {
   id: number
   projectPhaseId?: number
-  amount?: number
   paymentDate?: string
   paymentStatus?: PaymentStatus
   transactionId?: string
