@@ -22,6 +22,7 @@ const projectsApi = {
     fieldId: number
     userId: number
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
-  }) => http.put<SuccessResponse<Project>>('/api/v1/projects', body)
+  }) => http.put<SuccessResponse<Project>>('/api/v1/projects', body),
+  getProjectsByEmail: () => http.get<SuccessResponse<Project[]>>('/api/v1/projects')
 }
 export default projectsApi

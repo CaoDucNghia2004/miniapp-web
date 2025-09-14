@@ -1,99 +1,265 @@
-import { FileText, CheckCircle2, CreditCard, MessageSquare } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Card, Col, Row, List, Tag, Button, Modal, Timeline } from 'antd'
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { useState, useEffect } from 'react'
+import { FilePdfOutlined } from '@ant-design/icons'
 
-const stats = [
-  { label: 'Số dự án', value: 3, icon: FileText, color: 'text-blue-500' },
-  { label: 'Tiến độ TB', value: '65%', icon: CheckCircle2, color: 'text-green-500' },
-  { label: 'Hợp đồng', value: 5, icon: CreditCard, color: 'text-orange-500' },
-  { label: 'Đánh giá', value: 12, icon: MessageSquare, color: 'text-purple-500' }
-]
+import projectsApi from 'src/apis/projects.api'
+import contractsApi from 'src/apis/contracts.api'
+import projectPhasesApi from 'src/apis/projectPhases.api'
+import paymentsApi from 'src/apis/payments.api'
 
-const projects = [
-  {
-    id: 1,
-    name: 'Dự án Website A',
-    status: 'Đang thực hiện',
-    progress: 70,
-    startDate: '01/08/2025',
-    endDate: '30/09/2025'
-  },
-  {
-    id: 2,
-    name: 'Dự án Mobile App B',
-    status: 'Hoàn thành',
-    progress: 100,
-    startDate: '01/06/2025',
-    endDate: '15/07/2025'
-  },
-  {
-    id: 3,
-    name: 'Dự án ERP C',
-    status: 'Tạm dừng',
-    progress: 40,
-    startDate: '10/07/2025',
-    endDate: '—'
-  }
-]
+import type { Project } from 'src/types/projects.type'
+import type { Contract } from 'src/types/contract.type'
+import type { ProjectPhase } from 'src/types/projectPhase.type'
+import type { Payment } from 'src/types/payment.type'
+import {
+  getContractUrl,
+  getProjectStatusLabel,
+  getProjectPhaseStatusLabel,
+  getPaymentStatusLabel
+} from 'src/utils/utils'
 
 export default function DashboardUser() {
+  const [openDetail, setOpenDetail] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [projectPhases, setProjectPhases] = useState<ProjectPhase[]>([])
+  const [projectContracts, setProjectContracts] = useState<Contract[]>([])
+  const [projectPayments, setProjectPayments] = useState<Payment[]>([])
+
+  const [totalContracts, setTotalContracts] = useState<Contract[]>([])
+  const [totalPaid, setTotalPaid] = useState<number>(0)
+
+  const { data: projectsRes } = useQuery({
+    queryKey: ['projectsByEmail'],
+    queryFn: () => projectsApi.getProjectsByEmail().then((res) => res.data.data)
+  })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const projects: Project[] = projectsRes || []
+
+  // ===== Sau khi có projects thì load hợp đồng + thanh toán =====
+  useEffect(() => {
+    const fetchContractsAndPayments = async () => {
+      let allContracts: Contract[] = []
+      let allPayments: Payment[] = []
+      let allPhases: ProjectPhase[] = []
+
+      for (const project of projects) {
+        const contractsRes = await contractsApi.getContractsByProject(project.id)
+        allContracts = [...allContracts, ...(contractsRes.data.data || [])]
+
+        const phasesRes = await projectPhasesApi.getProjectPhasesByProjectId(project.id)
+        allPhases = [...allPhases, ...(phasesRes.data.data || [])]
+
+        try {
+          const paymentsRes = await paymentsApi.getPaymentsByProjectId(project.id)
+          allPayments = [...allPayments, ...(paymentsRes.data.data || [])]
+        } catch {
+          // nếu API không có thì bỏ qua
+        }
+      }
+
+      setTotalContracts(allContracts)
+
+      const paidAmount = allPayments
+        .filter((p) => p.paymentStatus === 'COMPLETED')
+        .reduce((sum, p) => {
+          const phase = allPhases.find((ph) => ph.id === p.projectPhaseId)
+          return sum + (phase?.amountDue || 0)
+        }, 0)
+
+      setTotalPaid(paidAmount)
+    }
+
+    if (projects.length > 0) {
+      fetchContractsAndPayments()
+    }
+  }, [projects])
+
+  const totalContractsValue = totalContracts.reduce((sum, c) => sum + (c.totalAmount || 0), 0)
+  const totalRemain = totalContractsValue - totalPaid
+
+  const handleOpenDetail = async (project: Project) => {
+    setSelectedProject(project)
+    setOpenDetail(true)
+
+    try {
+      const phasesRes = await projectPhasesApi.getProjectPhasesByProjectId(project.id)
+      setProjectPhases(phasesRes.data.data || [])
+
+      const contractsRes = await contractsApi.getContractsByProject(project.id)
+      setProjectContracts(contractsRes.data.data || [])
+
+      try {
+        const paymentsRes = await paymentsApi.getPaymentsByProjectId(project.id)
+        setProjectPayments(paymentsRes.data.data || [])
+      } catch {
+        setProjectPayments([])
+      }
+    } catch (error) {
+      console.error('Lỗi load chi tiết:', error)
+    }
+  }
+
   return (
-    <div className='space-y-8'>
-      {/* Stats section */}
-      <div>
-        <h1 className='text-2xl font-bold mb-2'>Dự án của bạn</h1>
-        <p className='text-gray-600'>Tổng quan trạng thái và tiến độ dự án</p>
+    <div className='space-y-6'>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title='📊 Số dự án đang tham gia' className='shadow-md rounded-xl bg-blue-50'>
+            {projects.length}
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title='📑 Tổng hợp đồng đã ký' className='shadow-md rounded-xl bg-purple-50'>
+            {totalContracts.length}
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title='💵 Đã thanh toán / Còn lại' className='shadow-md rounded-xl bg-green-50'>
+            ✅ {totalPaid.toLocaleString()} VND / ⚠️ {totalRemain.toLocaleString()} VND
+          </Card>
+        </Col>
+      </Row>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6'>
-          {stats.map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className='bg-white rounded-lg shadow p-4 flex items-center gap-4'>
-              <div className={`p-3 rounded-full bg-gray-100 ${color}`}>
-                <Icon size={24} />
-              </div>
-              <div>
-                <p className='text-sm text-gray-500'>{label}</p>
-                <p className='text-lg font-semibold'>{value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Project List */}
-      <div className='bg-white p-6 rounded-lg shadow'>
-        <h2 className='text-lg font-semibold mb-4'>Danh sách dự án</h2>
-        <div className='space-y-4'>
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              className='border rounded-md p-4 flex items-center justify-between hover:shadow-md transition'
+      <Card title={<span className='text-xl font-bold'>📋 Dự án của tôi</span>} className='shadow-md rounded-xl'>
+        <List
+          dataSource={projects}
+          renderItem={(item) => (
+            <List.Item
+              actions={[
+                <Button type='link' onClick={() => handleOpenDetail(item)}>
+                  Xem chi tiết
+                </Button>
+              ]}
             >
-              <div>
-                <h3 className='font-semibold text-gray-800'>{project.name}</h3>
-                <p className='text-sm text-gray-500'>{project.status}</p>
-                <div className='w-48 bg-gray-200 rounded-full h-2 mt-2'>
-                  <div
-                    className={`h-2 rounded-full ${
-                      project.progress === 100
-                        ? 'bg-green-500'
-                        : project.status === 'Tạm dừng'
-                          ? 'bg-red-400'
-                          : 'bg-orange-500'
-                    }`}
-                    style={{ width: `${project.progress}%` }}
-                  />
-                </div>
-                <p className='text-xs text-gray-400 mt-1'>{project.progress}% hoàn thành</p>
+              <List.Item.Meta
+                title={<span className='text-base font-semibold'>{item.name}</span>}
+                description={
+                  <div>
+                    <p>{item.description}</p>
+                    <p>
+                      ⏳ {dayjs(item.startDate).format('DD/MM/YYYY')} - {dayjs(item.endDate).format('DD/MM/YYYY')}
+                    </p>
+                    <Tag
+                      color={
+                        item.status === 'COMPLETED'
+                          ? 'green'
+                          : item.status === 'IN_PROGRESS'
+                            ? 'blue'
+                            : item.status === 'PENDING'
+                              ? 'orange'
+                              : 'red'
+                      }
+                    >
+                      {getProjectStatusLabel(item.status)}
+                    </Tag>
+                  </div>
+                }
+              />
+            </List.Item>
+          )}
+          locale={{ emptyText: 'Bạn chưa có dự án nào' }}
+        />
+      </Card>
+
+      <Modal
+        title={`📋 Chi tiết dự án: ${selectedProject?.name}`}
+        open={openDetail}
+        onCancel={() => setOpenDetail(false)}
+        footer={null}
+        width={900}
+      >
+        <Card title='📑 Giai đoạn dự án' bordered={false} className='shadow-sm rounded-lg'>
+          {projectPhases.length > 0 ? (
+            <Timeline
+              mode='left'
+              items={projectPhases.map((p) => {
+                const payment = projectPayments.find((pm) => pm.projectPhaseId === p.id)
+                return {
+                  label: (
+                    <Tag color='blue'>
+                      {dayjs(p.startDate).format('DD/MM/YYYY')} - {dayjs(p.endDate).format('DD/MM/YYYY')}
+                    </Tag>
+                  ),
+                  children: (
+                    <div className='pl-2'>
+                      <p className='font-semibold text-blue-600'>{p.phaseName}</p>
+                      <p className='text-gray-600 text-sm'>{p.description || 'Không có mô tả'}</p>
+                      <p>
+                        <b>Trạng thái giai đoạn:</b>{' '}
+                        <Tag
+                          color={p.status === 'COMPLETED' ? 'green' : p.status === 'IN_PROGRESS' ? 'orange' : 'default'}
+                        >
+                          {getProjectPhaseStatusLabel(p.status)}
+                        </Tag>
+                      </p>
+                      <p>
+                        <b>Số tiền:</b> {p.amountDue.toLocaleString()} VND
+                      </p>
+
+                      <p>
+                        <b>Thanh toán:</b>{' '}
+                        {payment ? (
+                          <Tag
+                            color={
+                              payment.paymentStatus === 'COMPLETED'
+                                ? 'green'
+                                : payment.paymentStatus === 'FAILED'
+                                  ? 'red'
+                                  : 'default'
+                            }
+                          >
+                            {getPaymentStatusLabel(payment.paymentStatus)}
+                          </Tag>
+                        ) : (
+                          <Tag color='default'>Chưa có</Tag>
+                        )}
+                      </p>
+                    </div>
+                  )
+                }
+              })}
+            />
+          ) : (
+            <p className='text-gray-500 italic'>Chưa có giai đoạn nào</p>
+          )}
+        </Card>
+
+        <Card title='📄 Hợp đồng' bordered={false} className='shadow-sm rounded-lg mt-4'>
+          {projectContracts.length > 0 ? (
+            projectContracts.map((c) => (
+              <div key={c.id} className='border p-3 mb-3 rounded-lg bg-gray-50 hover:shadow transition'>
+                <p>
+                  <b>Số hợp đồng:</b> {c.contractNumber}
+                </p>
+                <p>
+                  <b>Giá trị:</b> {c.totalAmount?.toLocaleString() || 0} VND
+                </p>
+                <p>
+                  <b>Ngày ký:</b> {c.signedDate ? dayjs(c.signedDate).format('DD/MM/YYYY') : 'Chưa ký'}
+                </p>
+                <p>
+                  <b>File:</b>{' '}
+                  {c.contractFile ? (
+                    <a
+                      href={getContractUrl(c.contractFile as string)}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-600 hover:underline'
+                    >
+                      <FilePdfOutlined /> Xem hợp đồng
+                    </a>
+                  ) : (
+                    <span className='text-gray-400 italic'>Chưa có file</span>
+                  )}
+                </p>
               </div>
-              <Link
-                to={`/project/project-details?id=${project.id}`}
-                className='text-orange-600 font-medium hover:underline'
-              >
-                Xem chi tiết →
-              </Link>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))
+          ) : (
+            <p className='text-gray-500 italic'>Chưa có hợp đồng</p>
+          )}
+        </Card>
+      </Modal>
     </div>
   )
 }

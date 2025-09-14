@@ -11,9 +11,8 @@ const path = {
   changePassword: '/user/password',
   project: '/project',
   projectDashboard: '/project/project-dashboard',
-  projectDetail: '/project/project-details',
+
   projectContract: '/project/project-contract',
-  projectComment: '/project/project-comment',
   forgotPassword: '/forgot-password',
 
   admin: '/admin',

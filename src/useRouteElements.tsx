@@ -18,8 +18,7 @@ import Profile from './pages/user/User/pages/Profile'
 import ChangePassword from './pages/user/User/pages/ChangePassword'
 import ProjectLayout from './pages/user/Projects/layouts/ProjectLayout'
 import DashboardUser from './pages/user/Projects/pages/DashboardUser'
-import ProjectDetail from './pages/user/Projects/pages/ProjectDetail'
-import ProjectComment from './pages/user/Projects/pages/ProjectComment'
+
 import ProjectContract from './pages/user/Projects/pages/ProjectContract'
 import ForgotPassword from './components/ForgotPassword'
 import AdminLayout from './pages/admin/layouts/AdminLayout'
@@ -149,14 +148,6 @@ export default function useRouteElements() {
             {
               path: path.projectDashboard,
               element: <DashboardUser />
-            },
-            {
-              path: path.projectDetail,
-              element: <ProjectDetail />
-            },
-            {
-              path: path.projectComment,
-              element: <ProjectComment />
             },
             {
               path: path.projectContract,

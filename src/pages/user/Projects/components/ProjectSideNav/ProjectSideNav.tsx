@@ -1,12 +1,11 @@
-import { CreditCard, FileText, LayoutDashboard, MessageSquare } from 'lucide-react'
+import { CreditCard, LayoutDashboard } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import path from 'src/constants/path'
 
 const navItems = [
   { to: path.projectDashboard, label: 'Dashboard', icon: LayoutDashboard },
-  { to: path.projectDetail, label: 'Chi tiết dự án', icon: FileText },
-  { to: path.projectContract, label: 'Hợp đồng & Thanh toán', icon: CreditCard },
-  { to: path.projectComment, label: 'Đánh giá dịch vụ', icon: MessageSquare }
+
+  { to: path.projectContract, label: 'Hợp đồng & Thanh toán', icon: CreditCard }
 ]
 
 export default function ProjectSideNav() {
