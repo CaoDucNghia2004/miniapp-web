@@ -3,6 +3,7 @@ import type { SuccessResponse } from 'src/types/utils.type'
 import http from 'src/utils/http'
 
 const projectPhasesApi = {
+  getAllPhases: () => http.get<SuccessResponse<ProjectPhase[]>>('/api/v1/project-phases'),
   // Lấy tất cả phases theo projectId
   getProjectPhasesByProjectId: (projectId: number) =>
     http.get<SuccessResponse<ProjectPhase[]>>(`/api/v1/project-phases/project/${projectId}`),

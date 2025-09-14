@@ -6,7 +6,7 @@ import { clearAccessTokenFromLS, clearProfileFromLS } from 'src/utils/auth'
 import SODLogo from 'src/assets/images/SOD_Logo.png'
 
 export default function AdminLayout() {
-  const [open, setOpen] = useState(true) // mở/đóng sidebar (mobile)
+  const [open, setOpen] = useState(true)
   const navigate = useNavigate()
   const { setIsAuthenticated, setProfile, profile } = useContext(AppContext)
 
@@ -51,10 +51,6 @@ export default function AdminLayout() {
             <span>🏷️</span> Quản lý lĩnh vực
           </NavLink>
 
-          <NavLink to='/admin/quotes' className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}>
-            <span>📝</span> Quản lý yêu cầu báo giá
-          </NavLink>
-
           <NavLink to='/admin/customers' className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}>
             <span>👥</span> Quản lý khách hàng
           </NavLink>
@@ -71,9 +67,6 @@ export default function AdminLayout() {
             <span>📂</span> Quản lý dự án / Tiến độ
           </NavLink>
 
-          <NavLink to='/admin/implemented' className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}>
-            <span>🚀</span> Dự án đã triển khai
-          </NavLink>
           <NavLink to='/admin/history' className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}>
             <span>🤑</span> Lịch sử giao dịch
           </NavLink>
@@ -105,11 +98,6 @@ export default function AdminLayout() {
           </div>
 
           <div className='flex items-center gap-3 md:gap-4'>
-            <div className='hidden items-center gap-2 rounded-lg border px-3 py-2 md:flex'>
-              <span>🔎</span>
-              <input className='w-56 outline-none placeholder:text-sm' placeholder='Search' />
-            </div>
-
             <button className='rounded-full p-2 hover:bg-gray-100' title='Notifications'>
               🔔
             </button>
