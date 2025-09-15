@@ -1,4 +1,4 @@
-import { Modal, Card, Descriptions, Timeline, Button, Popconfirm, Tag } from 'antd'
+import { Modal, Card, Descriptions, Timeline, Button, Popconfirm, Tag, Divider } from 'antd'
 import { DeleteOutlined, FilePdfOutlined } from '@ant-design/icons'
 import type { Project } from 'src/types/projects.type'
 import type { ProjectPhase } from 'src/types/projectPhase.type'
@@ -52,6 +52,8 @@ export default function ProjectDetailModal({
               </Descriptions.Item>
             </Descriptions>
           </Card>
+
+          <Divider />
 
           <Card title='📑 Giai đoạn dự án' bordered={false} className='shadow-sm rounded-lg'>
             {phases && phases.length > 0 ? (
@@ -115,6 +117,8 @@ export default function ProjectDetailModal({
               <p className='text-gray-500 italic'>Chưa có giai đoạn nào</p>
             )}
           </Card>
+
+          <Divider />
 
           <Card title='📄 Hợp đồng' bordered={false} className='shadow-sm rounded-lg'>
             {contracts && contracts.length > 0 ? (

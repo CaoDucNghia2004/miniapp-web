@@ -18,15 +18,8 @@ const userApi = {
   updateProfile(body: BodyUpdateProfile) {
     return http.put<SuccessResponse<BodyUpdateProfileResType>>('/api/v1/user', body)
   },
-  // uploadAvatar(body: FormData) {
-  //   return http.post<SuccessResponse<uploadAvatarResType>>('/api/v1/files', body, {
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data'
-  //     }
-  //   })
-  // }
   uploadAvatar({ body, folder }: { body: FormData; folder: string }) {
-    return http.post<SuccessResponse<uploadAvatarResType>>(`/api/v1/files?folder=${folder}`, body, {
+    return http.post<SuccessResponse<uploadAvatarResType>>(`/api/v1/files/${folder}`, body, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

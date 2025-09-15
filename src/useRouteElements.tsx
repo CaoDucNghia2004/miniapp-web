@@ -31,16 +31,19 @@ import ProjectManagement from './pages/admin/pages/ProjectManagement'
 import AccountRequests from './pages/admin/pages/AccountRequests'
 import AdminFields from './pages/admin/pages/AdminFields'
 
+// eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function RejectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
   return !isAuthenticated ? <Outlet /> : <Navigate to='/' />
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function AdminRoute() {
   const { isAuthenticated, profile } = useContext(AppContext)
   if (!isAuthenticated) return <Navigate to={path.login} />

@@ -136,8 +136,8 @@ export default function DashboardUser() {
                 title={<span className='text-base font-semibold'>{item.name}</span>}
                 description={
                   <div>
-                    <p>{item.description}</p>
-                    <p>
+                    <p className='mt-2'>{item.description}</p>
+                    <p className='my-2'>
                       ⏳ {dayjs(item.startDate).format('DD/MM/YYYY')} - {dayjs(item.endDate).format('DD/MM/YYYY')}
                     </p>
                     <Tag

@@ -1,5 +1,19 @@
 import { useState } from 'react'
-import { Table, Tag, Button, Modal, Form, Select, DatePicker, Input, Descriptions, Card, message, Space } from 'antd'
+import {
+  Table,
+  Tag,
+  Button,
+  Modal,
+  Form,
+  Select,
+  DatePicker,
+  Input,
+  Descriptions,
+  Card,
+  message,
+  Space,
+  Divider
+} from 'antd'
 import {
   EditOutlined,
   PlusOutlined,
@@ -333,6 +347,7 @@ export default function PaymentManagement() {
             </Form.Item>
           </Card>
 
+          <Divider />
           {selectedProject && (
             <Card size='small' title='📑 Thông tin giai đoạn' bordered={false}>
               <Form.Item label='Chọn giai đoạn' name='phaseId' rules={[{ required: true }]}>
