@@ -45,8 +45,8 @@ export default function Header() {
           <a href={ProcedurePdf} target='_blank' rel='noopener noreferrer' className={externalNavClass}>
             Quy trình
           </a>
-          <NavLink to='/your-project' className={navLinkClass}>
-            Dự án của bạn
+          <NavLink to={path.projectDashboard} className={navLinkClass}>
+            Dự án của tôi
           </NavLink>
         </nav>
 
@@ -82,7 +82,7 @@ export default function Header() {
                     to={path.projectDashboard}
                     className='block py-3 px-4 hover:bg-slate-100 bg-white hover:text-cyan-500 w-full text-left'
                   >
-                    Dự án của bạn
+                    Dự án của tôi
                   </Link>
                 )}
                 <button

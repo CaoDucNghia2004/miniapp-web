@@ -17,7 +17,7 @@ export default function Popover({
   className,
   as: Element = 'div',
   initialOpen,
-  placement = 'bottom-end'
+  placement = 'bottom'
 }: Props) {
   const [open, setOpen] = useState(initialOpen || false)
   const arrowRef = useRef<HTMLElement>(null)

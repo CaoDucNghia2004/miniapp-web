@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { FaRocket, FaBullseye, FaGem, FaLightbulb } from 'react-icons/fa'
+import { FaRocket, FaBullseye, FaGem, FaLightbulb, FaArrowRight } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 import ImageSlider from 'src/components/ImageSlider'
+import path from 'src/constants/path'
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -122,10 +123,10 @@ export default function AboutUs() {
           </motion.p>
           <motion.div variants={fadeInUp} custom={3}>
             <Link
-              to='#'
-              className='inline-block bg-orange-500 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-orange-600 transition transform duration-300'
+              to={path.register}
+              className='bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-3 rounded-full shadow-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center gap-2 hover:scale-105'
             >
-              Liên hệ ngay
+              Đăng ký ngay <FaArrowRight className='text-sm' />
             </Link>
           </motion.div>
         </motion.div>

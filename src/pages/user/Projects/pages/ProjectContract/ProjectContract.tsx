@@ -1,119 +1,170 @@
-import { CreditCard, Calendar, FileText, CheckCircle2, XCircle } from 'lucide-react'
+import { Card, Divider, Table, Tag } from 'antd'
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 
-const contract = {
-  id: 'HD2025-001',
-  signedDate: '02/08/2025',
-  value: 200_000_000,
-  status: 'Đang hiệu lực',
-  payments: [
-    { id: 1, date: '05/08/2025', amount: 50_000_000, status: 'Đã thanh toán' },
-    { id: 2, date: '15/08/2025', amount: 50_000_000, status: 'Đã thanh toán' },
-    { id: 3, date: '01/09/2025', amount: 50_000_000, status: 'Chưa thanh toán' },
-    { id: 4, date: '15/09/2025', amount: 50_000_000, status: 'Chưa thanh toán' }
-  ]
-}
+import contractsApi from 'src/apis/contracts.api'
+import projectsApi from 'src/apis/projects.api'
+import paymentsApi from 'src/apis/payments.api'
+import projectPhasesApi from 'src/apis/projectPhases.api'
 
-function formatCurrency(amount: number) {
-  return amount.toLocaleString('vi-VN') + ' VNĐ'
+import type { Contract } from 'src/types/contract.type'
+import type { Payment } from 'src/types/payment.type'
+import type { ProjectPhase } from 'src/types/projectPhase.type'
+import type { Project } from 'src/types/projects.type'
+import { getContractUrl, getPaymentStatusLabel } from 'src/utils/utils'
+
+interface PaymentWithInfo extends Payment {
+  projectName?: string
+  phaseName?: string
+  amountDue?: number
 }
 
 export default function ProjectContract() {
-  const totalPaid = contract.payments.filter((p) => p.status === 'Đã thanh toán').reduce((sum, p) => sum + p.amount, 0)
+  // ===== Lấy danh sách dự án theo email =====
+  const { data: projectsRes } = useQuery({
+    queryKey: ['projectsByEmail'],
+    queryFn: () => projectsApi.getProjectsByEmail().then((res) => res.data.data)
+  })
+  const projects: Project[] = projectsRes || []
 
-  const remaining = contract.value - totalPaid
+  // ===== Lấy danh sách hợp đồng theo email =====
+  const { data: contractsRes } = useQuery({
+    queryKey: ['contractsByEmail'],
+    queryFn: () => contractsApi.getContractsByEmail('').then((res) => res.data.data)
+  })
+  const contracts: Contract[] = contractsRes || []
+
+  // ===== Lấy payments & phases cho tất cả project =====
+  const { data: paymentsData } = useQuery({
+    queryKey: ['paymentsAndPhases'],
+    queryFn: async () => {
+      let allPayments: PaymentWithInfo[] = []
+
+      for (const project of projects) {
+        const phasesRes = await projectPhasesApi.getProjectPhasesByProjectId(project.id)
+        const phases: ProjectPhase[] = phasesRes.data.data || []
+
+        try {
+          const paymentsRes = await paymentsApi.getPaymentsByProjectId(project.id)
+          const payments: Payment[] = paymentsRes.data.data || []
+
+          const enrichedPayments = payments.map((p) => {
+            const phase = phases.find((ph) => ph.id === p.projectPhaseId)
+            return {
+              ...p,
+              projectName: project.name,
+              phaseName: phase?.phaseName,
+              amountDue: phase?.amountDue
+            }
+          })
+
+          allPayments = [...allPayments, ...enrichedPayments]
+        } catch {
+          // nếu không có API thanh toán thì bỏ qua
+        }
+      }
+
+      return allPayments
+    },
+    enabled: projects.length > 0
+  })
+  const payments: PaymentWithInfo[] = paymentsData || []
+
+  // ===== Cột bảng Hợp đồng =====
+  const contractColumns = [
+    {
+      title: 'Số hợp đồng',
+      dataIndex: 'contractNumber',
+      key: 'contractNumber'
+    },
+    {
+      title: 'Ngày ký',
+      dataIndex: 'signedDate',
+      key: 'signedDate',
+      render: (date: string) => (date ? dayjs(date).format('DD/MM/YYYY') : 'Chưa ký')
+    },
+    {
+      title: 'Giá trị hợp đồng',
+      dataIndex: 'totalAmount',
+      key: 'totalAmount',
+      render: (value: number) => `${value?.toLocaleString() || 0} VND`
+    },
+    {
+      title: 'File hợp đồng',
+      dataIndex: 'contractFile',
+      key: 'contractFile',
+      render: (file: string) =>
+        file ? (
+          <a href={getContractUrl(file)} target='_blank' rel='noopener noreferrer'>
+            Xem file
+          </a>
+        ) : (
+          <span className='text-gray-400 italic'>Chưa có file</span>
+        )
+    }
+  ]
+
+  const paymentColumns = [
+    {
+      title: 'Ngày thanh toán',
+      dataIndex: 'paymentDate',
+      key: 'paymentDate',
+      render: (date: string) => dayjs(date).format('DD/MM/YYYY')
+    },
+    {
+      title: 'Dự án + Giai đoạn',
+      key: 'phaseName',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (_: any, record: PaymentWithInfo) => (
+        <span>
+          {record.projectName || 'Dự án'} - {record.phaseName || 'Giai đoạn'}
+        </span>
+      )
+    },
+    {
+      title: 'Số tiền',
+      key: 'amountDue',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (_: any, record: PaymentWithInfo) => `${record.amountDue?.toLocaleString() || 0} VND`
+    },
+    {
+      title: 'Trạng thái thanh toán',
+      dataIndex: 'paymentStatus',
+      key: 'paymentStatus',
+      render: (status: string) => {
+        const typedStatus = status as 'COMPLETED' | 'FAILED' | 'PENDING'
+        return (
+          <Tag color={typedStatus === 'COMPLETED' ? 'green' : typedStatus === 'FAILED' ? 'red' : 'orange'}>
+            {getPaymentStatusLabel(typedStatus)}
+          </Tag>
+        )
+      }
+    }
+  ]
 
   return (
-    <div className='space-y-8'>
-      {/* Header */}
-      <div>
-        <h1 className='text-2xl font-bold mb-2'>Hợp đồng & Thanh toán</h1>
-        <p className='text-gray-600'>Thông tin hợp đồng và tiến trình thanh toán</p>
-      </div>
+    <div className='space-y-6'>
+      <Card title='📑 Danh sách hợp đồng' className='shadow-md rounded-xl'>
+        <Table
+          rowKey='id'
+          dataSource={contracts}
+          columns={contractColumns}
+          pagination={false}
+          locale={{ emptyText: 'Chưa có hợp đồng' }}
+        />
+      </Card>
 
-      {/* Contract Info */}
-      <div className='bg-white p-6 rounded-lg shadow space-y-3'>
-        <h2 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-          <FileText size={20} className='text-orange-500' /> Thông tin hợp đồng
-        </h2>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-          <div className='p-3 bg-gray-50 rounded-md'>
-            <p className='text-xs text-gray-500'>Số hợp đồng</p>
-            <p className='font-medium text-gray-800'>{contract.id}</p>
-          </div>
-          <div className='p-3 bg-gray-50 rounded-md flex items-center gap-2'>
-            <Calendar size={16} className='text-orange-500' />
-            <div>
-              <p className='text-xs text-gray-500'>Ngày ký</p>
-              <p className='font-medium text-gray-800'>{contract.signedDate}</p>
-            </div>
-          </div>
-          <div className='p-3 bg-gray-50 rounded-md'>
-            <p className='text-xs text-gray-500'>Giá trị hợp đồng</p>
-            <p className='font-medium text-gray-800'>{formatCurrency(contract.value)}</p>
-          </div>
-          <div className='p-3 bg-gray-50 rounded-md flex items-center gap-2'>
-            <CreditCard size={16} className='text-orange-500' />
-            <div>
-              <p className='text-xs text-gray-500'>Trạng thái</p>
-              <p className='font-medium text-green-600'>{contract.status}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Divider />
 
-      {/* Payment Table */}
-      <div className='bg-white p-6 rounded-lg shadow'>
-        <h2 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-          <CreditCard size={20} className='text-orange-500' /> Lịch sử thanh toán
-        </h2>
-        <div className='overflow-x-auto'>
-          <table className='w-full border border-gray-200 rounded-md'>
-            <thead className='bg-gray-100 text-sm text-gray-600'>
-              <tr>
-                <th className='px-4 py-2 text-left'>#</th>
-                <th className='px-4 py-2 text-left'>Ngày</th>
-                <th className='px-4 py-2 text-left'>Số tiền</th>
-                <th className='px-4 py-2 text-left'>Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody className='text-sm'>
-              {contract.payments.map((p) => (
-                <tr key={p.id} className='border-t'>
-                  <td className='px-4 py-2'>{p.id}</td>
-                  <td className='px-4 py-2'>{p.date}</td>
-                  <td className='px-4 py-2'>{formatCurrency(p.amount)}</td>
-                  <td className='px-4 py-2 flex items-center gap-1'>
-                    {p.status === 'Đã thanh toán' ? (
-                      <CheckCircle2 size={16} className='text-green-500' />
-                    ) : (
-                      <XCircle size={16} className='text-red-500' />
-                    )}
-                    <span
-                      className={
-                        p.status === 'Đã thanh toán' ? 'text-green-600 font-medium' : 'text-red-500 font-medium'
-                      }
-                    >
-                      {p.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Summary */}
-      <div className='bg-white p-6 rounded-lg shadow grid grid-cols-1 sm:grid-cols-2 gap-6'>
-        <div className='p-4 bg-green-50 border border-green-200 rounded-md'>
-          <p className='text-sm text-gray-600'>Đã thanh toán</p>
-          <p className='text-lg font-semibold text-green-600'>{formatCurrency(totalPaid)}</p>
-        </div>
-        <div className='p-4 bg-red-50 border border-red-200 rounded-md'>
-          <p className='text-sm text-gray-600'>Còn lại</p>
-          <p className='text-lg font-semibold text-red-600'>{formatCurrency(remaining)}</p>
-        </div>
-      </div>
+      <Card title='💵 Lịch sử thanh toán' className='shadow-md rounded-xl'>
+        <Table
+          rowKey='id'
+          dataSource={payments}
+          columns={paymentColumns}
+          pagination={false}
+          locale={{ emptyText: 'Chưa có thanh toán' }}
+        />
+      </Card>
     </div>
   )
 }

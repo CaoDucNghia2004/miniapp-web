@@ -1,6 +1,8 @@
 import { FaArrowRight } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 import RegisterCTAImg from 'src/assets/images/registerCTA.png'
+import { Link } from 'react-router-dom'
+import path from 'src/constants/path'
 
 export default function RegisterCTA() {
   return (
@@ -55,9 +57,12 @@ export default function RegisterCTA() {
               viewport={{ once: true }}
               className='mt-8'
             >
-              <button className='bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-3 rounded-full shadow-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center gap-2 hover:scale-105'>
-                Đăng ký <FaArrowRight className='text-sm' />
-              </button>
+              <Link
+                to={path.register}
+                className='bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-3 rounded-full shadow-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center gap-2 hover:scale-105'
+              >
+                Đăng ký ngay <FaArrowRight className='text-sm' />
+              </Link>
             </motion.div>
           </div>
         </motion.div>

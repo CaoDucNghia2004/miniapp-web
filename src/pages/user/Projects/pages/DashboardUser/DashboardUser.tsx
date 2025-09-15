@@ -1,4 +1,4 @@
-import { Card, Col, Row, List, Tag, Button, Modal, Timeline } from 'antd'
+import { Card, Col, Row, List, Tag, Button, Modal, Timeline, Divider } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useState, useEffect } from 'react'
@@ -224,6 +224,8 @@ export default function DashboardUser() {
             <p className='text-gray-500 italic'>Chưa có giai đoạn nào</p>
           )}
         </Card>
+
+        <Divider />
 
         <Card title='📄 Hợp đồng' bordered={false} className='shadow-sm rounded-lg mt-4'>
           {projectContracts.length > 0 ? (

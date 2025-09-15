@@ -97,8 +97,8 @@ export default function PrivacyPolicy() {
           <p>Nếu bạn có bất kỳ câu hỏi nào về chính sách bảo mật này, vui lòng liên hệ với chúng tôi qua:</p>
           <ul className='pl-5 mt-2 space-y-1 list-disc'>
             <li>Email: support@vietsunco.vn</li>
-            <li>SĐT: 0123 456 789</li>
-            <li>Địa chỉ: [Thêm địa chỉ cụ thể nếu có]</li>
+            <li>SĐT: 024 5678 5999</li>
+            <li>Địa chỉ: Diamond Plaza, 34 Lê Duẩn, Bến Nghé, Quận 1, Hồ Chí Minh</li>
           </ul>
         </div>
       </section>
