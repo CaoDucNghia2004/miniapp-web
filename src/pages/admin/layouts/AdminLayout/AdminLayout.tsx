@@ -4,6 +4,7 @@ import { AppContext } from 'src/contexts/app.context'
 import path from 'src/constants/path'
 import { clearAccessTokenFromLS, clearProfileFromLS } from 'src/utils/auth'
 import SODLogo from 'src/assets/images/SOD_Logo.png'
+import { Helmet } from 'react-helmet-async'
 
 export default function AdminLayout() {
   const [open, setOpen] = useState(true)
@@ -24,6 +25,10 @@ export default function AdminLayout() {
 
   return (
     <div className='flex h-screen bg-gray-50'>
+      <Helmet>
+        <title>Admin Dashboard</title>
+        <meta name='description' content='Trang quản trị hệ thống MiniApp' />
+      </Helmet>
       <aside
         className={`${
           open ? 'translate-x-0' : '-translate-x-full'
@@ -66,10 +71,6 @@ export default function AdminLayout() {
           <NavLink to='/admin/projects' className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}>
             <span>📂</span> Quản lý dự án / Tiến độ
           </NavLink>
-
-          <NavLink to='/admin/history' className={({ isActive }) => `${item} ${isActive ? itemActive : itemIdle}`}>
-            <span>🤑</span> Lịch sử giao dịch
-          </NavLink>
         </nav>
 
         <div className='border-t px-4 py-4'>
@@ -85,7 +86,7 @@ export default function AdminLayout() {
       {/* Main area */}
       <div className='flex min-w-0 flex-1 flex-col'>
         {/* Header */}
-        <header className='sticky top-0 z-20 flex items-center justify-between bg-white px-4 py-3 shadow-sm md:px-6'>
+        <header className='sticky top-0 z-20 flex items-center justify-between bg-white px-4 py-5 shadow-sm md:px-6'>
           <div className='flex items-center gap-3'>
             <button
               onClick={() => setOpen((v) => !v)}
@@ -98,13 +99,6 @@ export default function AdminLayout() {
           </div>
 
           <div className='flex items-center gap-3 md:gap-4'>
-            <button className='rounded-full p-2 hover:bg-gray-100' title='Notifications'>
-              🔔
-            </button>
-            <button className='rounded-full p-2 hover:bg-gray-100' title='Messages'>
-              💬
-            </button>
-
             <div className='flex items-center gap-2 rounded-full bg-gray-100 px-3 py-2'>
               <div className='flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 text-gray-600'>
                 {profile?.name?.[0]?.toUpperCase() || 'A'}

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 
 import HeroImage from 'src/assets/images/hero-minapp.png'
@@ -30,6 +31,13 @@ const features = [
 export default function Home() {
   return (
     <main>
+      <Helmet>
+        <title>MiniApp Web | Trang chủ</title>
+        <meta
+          name='description'
+          content='MiniApp Web - Dịch vụ thiết kế và xây dựng MiniApp chuyên nghiệp. Tiếp cận hàng triệu người dùng, giảm chi phí phát triển, và tăng hiệu quả kinh doanh với giải pháp toàn diện của chúng tôi.'
+        />
+      </Helmet>
       <section className='py-16'>
         <div className='max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-y-48'>
           <motion.div

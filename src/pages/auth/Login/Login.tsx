@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import { useContext, useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -112,6 +113,10 @@ export default function Login() {
 
   return (
     <div className='bg-gradient-to-br from-stone-100 via-white to-orange-50'>
+      <Helmet>
+        <title>Đăng nhập - MiniApp</title>
+        <meta name='description' content='Đăng nhập để sử dụng các tính năng của trang web' />
+      </Helmet>
       <div className='max-w-7xl mx-auto px-4'>
         <div className='grid grid-cols-1 lg:grid-cols-5 py-12 lg:py-20 lg:pr-10'>
           <div className='lg:col-span-3 hidden lg:block'>

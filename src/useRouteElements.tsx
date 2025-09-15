@@ -28,8 +28,6 @@ import CustomerManagement from './pages/admin/pages/CustomerManagement'
 import ContractManagement from './pages/admin/pages/ContractManagement'
 import PaymentManagement from './pages/admin/pages/PaymentManagement'
 import ProjectManagement from './pages/admin/pages/ProjectManagement'
-
-import TransactionHistory from './pages/admin/pages/TransactionHistory'
 import AccountRequests from './pages/admin/pages/AccountRequests'
 import AdminFields from './pages/admin/pages/AdminFields'
 
@@ -170,7 +168,6 @@ export default function useRouteElements() {
             { path: '/admin/contracts', element: <ContractManagement /> },
             { path: '/admin/payments', element: <PaymentManagement /> },
             { path: '/admin/projects', element: <ProjectManagement /> },
-            { path: '/admin/history', element: <TransactionHistory /> },
             { path: '/admin/registrations', element: <AccountRequests /> },
             { path: path.adminFields, element: <AdminFields /> }
           ]

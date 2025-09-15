@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -8,6 +9,7 @@ import formsApi from 'src/apis/forms.api'
 import ImageSlider from 'src/components/ImageSlider'
 import Input from 'src/components/Input'
 import SuccessDialog from 'src/components/SuccessDialog'
+import path from 'src/constants/path'
 import type { CreateFormBody, Field } from 'src/types/form.type'
 import type { ErrorResponse } from 'src/types/utils.type'
 import { schema, type Schema } from 'src/utils/rules'
@@ -67,6 +69,10 @@ export default function Register() {
 
   return (
     <>
+      <Helmet>
+        <title>Đăng ký - Liên hệ</title>
+        <meta name='description' content='Đăng ký để lại thông tin của bạn' />
+      </Helmet>
       <div className='bg-gradient-to-br from-stone-100 via-white to-orange-50'>
         <div className='max-w-7xl mx-auto px-4'>
           <div className='grid grid-cols-1 lg:grid-cols-5 py-12 lg:py-20 lg:pr-10'>
@@ -127,7 +133,7 @@ export default function Register() {
                 </div>
                 <div className='flex items-center justify-center mt-8'>
                   <span className='text-gray-400'>Bạn đã có tài khoản?</span>
-                  <Link className='text-red-400 ml-1' to='/login'>
+                  <Link className='text-red-400 ml-1' to={path.login}>
                     Đăng nhập
                   </Link>
                 </div>

@@ -3,6 +3,7 @@ import { FaRocket, FaBullseye, FaGem, FaLightbulb, FaArrowRight } from 'react-ic
 import { motion } from 'framer-motion'
 import ImageSlider from 'src/components/ImageSlider'
 import path from 'src/constants/path'
+import { Helmet } from 'react-helmet-async'
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -19,6 +20,13 @@ const fadeInUp = {
 export default function AboutUs() {
   return (
     <div className='bg-white text-gray-800'>
+      <Helmet>
+        <title>MiniApp Web | Về chúng tôi</title>
+        <meta
+          name='description'
+          content='Tìm hiểu về Vietsunco - Đối tác tin cậy trong việc xây dựng MiniApp cho doanh nghiệp Việt Nam. Khám phá sứ mệnh, tầm nhìn và giá trị cốt lõi của chúng tôi ngay hôm nay!'
+        />
+      </Helmet>
       <section className='bg-gradient-to-b from-orange-50 to-white py-16 text-center px-4'>
         <motion.div initial='hidden' whileInView='visible' viewport={{ once: true }}>
           <motion.div custom={0} variants={fadeInUp}>

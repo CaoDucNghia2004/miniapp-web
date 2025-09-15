@@ -6,10 +6,18 @@ import LeftStroke from 'src/assets/images/stroke-left.png'
 import RightStroke from 'src/assets/images/stroke-right.png'
 
 import PricingSection from 'src/components/PricingSection'
+import { Helmet } from 'react-helmet-async'
 
 export default function Services() {
   return (
     <>
+      <Helmet>
+        <title>MiniApp Web | Dịch vụ</title>
+        <meta
+          name='description'
+          content='Khám phá dịch vụ thiết kế và xây dựng MiniApp chuyên nghiệp của chúng tôi. Tạo trải nghiệm di động mượt mà và hấp dẫn cho người dùng của bạn ngay hôm nay!'
+        />
+      </Helmet>
       <section
         className='relative w-full h-[320px] md:h-[860px] flex items-center justify-center text-white object-contain'
         style={{

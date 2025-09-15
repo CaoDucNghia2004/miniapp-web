@@ -5,10 +5,18 @@ import { FaQuoteLeft } from 'react-icons/fa'
 import CustomerSay from 'src/components/CustomerSay'
 import RegisterCTA from 'src/components/RegisterCTA'
 import { motion } from 'framer-motion'
+import { Helmet } from 'react-helmet-async'
 
 export default function Partners() {
   return (
     <>
+      <Helmet>
+        <title>MiniApp Web | Đối tác</title>
+        <meta
+          name='description'
+          content='Khám phá cách MiniApp đã giúp các nghệ nhân và doanh nhân biến đam mê thành thu nhập ổn định. Tạo trải nghiệm di động mượt mà và hấp dẫn cho người dùng của bạn ngay hôm nay!'
+        />
+      </Helmet>
       <section className='relative bg-white pb-10 overflow-hidden'>
         <div className='relative w-full h-[560px] overflow-hidden'>
           <motion.div

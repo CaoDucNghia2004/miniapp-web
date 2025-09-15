@@ -1,9 +1,17 @@
 import { motion } from 'framer-motion'
+import { Helmet } from 'react-helmet-async'
 import bannerImage from 'src/assets/images/privacy-banner.png'
 
 export default function PrivacyPolicy() {
   return (
     <>
+      <Helmet>
+        <title>MiniApp Web | Chính sách bảo mật</title>
+        <meta
+          name='description'
+          content='Tìm hiểu về Chính sách bảo mật của Vietsunco - Cam kết bảo vệ thông tin cá nhân và quyền riêng tư của bạn khi sử dụng dịch vụ MiniApp của chúng tôi.'
+        />
+      </Helmet>
       <section
         className='relative w-full h-[420px] md:h-[900px] flex items-center justify-center text-white object-contain'
         style={{

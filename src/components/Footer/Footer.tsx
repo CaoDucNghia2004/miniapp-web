@@ -10,7 +10,7 @@ export default function Footer() {
       <div className='max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-sm text-gray-700 '>
         <div>
           <Link to='/'>
-            <img src={SODLogo} alt='SOD Logo' className='w-15 h-15 lg:w-20 lg:h-20 object-cover' />
+            <img src={SODLogo} alt='SOD Logo' className='w-15 h-15 lg:w-20 lg:h-20 object-cover mb-4' />
           </Link>
           <p className='font-semibold mt-4 mb-2 text-xl lg:text-2xl'>Công ty Thương mại Dịch vụ VietSunCo</p>
           <ul className='space-y-1'>
@@ -20,7 +20,7 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h3 className='font-semibold text-gray-900 mb-2 text-xl'>Chuyên mục</h3>
+          <h3 className='font-bold text-gray-900 mb-2 text-xl'>Chuyên mục</h3>
           <ul className='space-y-1 list-disc list-inside mt-4'>
             <li>
               <Link to={path.services} className='hover:text-blue-500 text-base'>
@@ -41,7 +41,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className='font-semibold text-gray-900 mb-2 text-xl'>Liên hệ</h3>
+          <h3 className='font-bold text-gray-900 mb-2 text-xl'>Liên hệ</h3>
           <div className='flex space-x-6 mt-4'>
             <Link to='#' className='transform transition duration-300 hover:-translate-y-1 hover:scale-110 '>
               <FaFacebook className='text-blue-600 w-10 h-10' />
