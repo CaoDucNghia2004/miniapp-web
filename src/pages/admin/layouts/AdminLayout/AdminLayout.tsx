@@ -36,7 +36,7 @@ export default function AdminLayout() {
       >
         <div className='flex items-center gap-3 border-b px-6 py-5'>
           <Link to='/' className='flex items-center gap-2'>
-            <img src={SODLogo} alt='SOD Logo' className='h-12 w-auto object-contain' />
+            <img src={SODLogo} alt='SOD Logo' className='h-12 w-auto object-contain rounded-sm' />
           </Link>
           <div className='text-xl font-bold text-gray-900'>Administration</div>
         </div>

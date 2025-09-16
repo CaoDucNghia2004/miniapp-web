@@ -184,7 +184,7 @@ export default function AdminDashboard() {
           </Card>
         </Col>
         <Col span={12}>
-          <Card title='📊 Dự án & Hợp đồng theo tháng'>
+          <Card title='📊 Dự án theo tháng'>
             <ResponsiveContainer width='100%' height={300}>
               <BarChart data={monthlyData}>
                 <XAxis dataKey='month' />
@@ -192,7 +192,6 @@ export default function AdminDashboard() {
                 <Tooltip />
                 <Legend />
                 <Bar dataKey='projects' fill='#1890ff' name='Dự án' />
-                <Bar dataKey='contracts' fill='#faad14' name='Hợp đồng' />
               </BarChart>
             </ResponsiveContainer>
           </Card>
@@ -206,8 +205,11 @@ export default function AdminDashboard() {
               <LineChart data={monthlyData}>
                 <CartesianGrid strokeDasharray='3 3' />
                 <XAxis dataKey='month' />
-                <YAxis />
-                <Tooltip />
+                <YAxis tickFormatter={(value) => `${value.toLocaleString()}`} />
+                <Tooltip
+                  formatter={(value: number) => [`${value.toLocaleString()} VND`, 'Doanh thu']}
+                  labelFormatter={(label) => `Tháng ${label}`}
+                />
                 <Line type='monotone' dataKey='revenue' stroke='#52c41a' name='Doanh thu' />
               </LineChart>
             </ResponsiveContainer>

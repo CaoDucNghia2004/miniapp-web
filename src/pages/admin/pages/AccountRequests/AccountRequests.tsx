@@ -16,7 +16,6 @@ export default function AccountRequests() {
   const [search, setSearch] = useState('')
 
   const [messageApi, contextHolder] = message.useMessage()
-
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
@@ -39,10 +38,8 @@ export default function AccountRequests() {
 
   const createAccountMutation = useMutation({
     mutationFn: async (body: { email: string; password: string; name: string; phone: string; companyName: string }) => {
-      // Tạo user bằng adminUsersApi
       const res = await adminUsersApi.createUser(body)
 
-      // Gửi mail cho khách hàng
       await authApi.sendAccount({
         email: body.email,
         password: body.password,
@@ -51,10 +48,15 @@ export default function AccountRequests() {
 
       return res
     },
-    onSuccess: (res) => {
+    onSuccess: (res, variables) => {
       messageApi.success(res.data.message || 'Đã tạo tài khoản & gửi mail cho khách hàng')
       setOpenModal(false)
       form.resetFields()
+
+      // Cập nhật cache để nút tạo tài khoản ẩn đi
+      queryClient.setQueryData<FormType[]>(['forms'], (old) =>
+        old ? old.map((f) => (f.email === variables.email ? { ...f, hasAccount: true } : f)) : old
+      )
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -136,7 +138,7 @@ export default function AccountRequests() {
       render: (_: any, record: FormType) => (
         <Button
           type='primary'
-          disabled={!record.isAdvised}
+          disabled={!record.isAdvised || record.hasAccount}
           onClick={() => {
             setSelected(record)
             setOpenModal(true)
@@ -144,7 +146,7 @@ export default function AccountRequests() {
             form.resetFields()
           }}
         >
-          Tạo tài khoản
+          {record.hasAccount ? 'Đã có tài khoản' : 'Tạo tài khoản'}
         </Button>
       )
     }
@@ -230,7 +232,7 @@ export default function AccountRequests() {
                 form.setFields([
                   { name: 'email', errors: [] },
                   { name: 'password', errors: [] }
-                ]) // clear lỗi cũ
+                ])
                 createAccountMutation.mutate({
                   email: selected.email,
                   password: pwd,

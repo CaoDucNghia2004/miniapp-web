@@ -28,7 +28,7 @@ export default function Header() {
     <header className='bg-white shadow-sm sticky top-0 z-50'>
       <div className='max-w-7xl mx-auto px-6 py-6 flex items-center justify-between '>
         <Link to='/' className='flex items-center gap-2'>
-          <img src={SODLogo} alt='SOD Logo' className='h-12 w-auto object-contain' />
+          <img src={SODLogo} alt='SOD Logo' className='h-15 w-auto object-contain rounded-sm' />
           <span className='text-orange-500 font-bold text-xl'>MiniApp</span>
         </Link>
 

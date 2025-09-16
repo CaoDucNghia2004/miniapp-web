@@ -269,6 +269,7 @@ export default function ProjectManagement() {
           <Button
             type='link'
             icon={<EditOutlined />}
+            disabled={record.status === 'CANCELLED'}
             onClick={() => {
               setEditingProject(record)
               setSelectedProject(record)

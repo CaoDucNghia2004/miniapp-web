@@ -70,7 +70,7 @@ export default function Register() {
   return (
     <>
       <Helmet>
-        <title>Đăng ký - Liên hệ</title>
+        <title>MiniApp Web | Đăng ký liên hệ</title>
         <meta name='description' content='Đăng ký để lại thông tin của bạn' />
       </Helmet>
       <div className='bg-gradient-to-br from-stone-100 via-white to-orange-50'>

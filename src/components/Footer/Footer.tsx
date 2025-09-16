@@ -10,13 +10,13 @@ export default function Footer() {
       <div className='max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-sm text-gray-700 '>
         <div>
           <Link to='/'>
-            <img src={SODLogo} alt='SOD Logo' className='w-15 h-15 lg:w-20 lg:h-20 object-cover mb-4' />
+            <img src={SODLogo} alt='SOD Logo' className='h-15 w-auto lg:w-20 lg:h-20 object-cover mb-4 rounded-sm' />
           </Link>
-          <p className='font-semibold mt-4 mb-2 text-xl lg:text-2xl'>Công ty Thương mại Dịch vụ VietSunCo</p>
+          <p className='font-semibold mt-4 mb-2 text-xl lg:text-2xl'>Công ty Thương mại Dịch vụ SOD Solution</p>
           <ul className='space-y-1'>
             <li className='text-base'>📞 024 5678 5999</li>
-            <li className='text-base'>📧 info@vietsunco@gmail.com</li>
-            <li className='text-base'>📍 Diamond Plaza, 34 Lê Duẩn, Bến Nghé, Quận 1, Hồ Chí Minh</li>
+            <li className='text-base'>📧 infoSODSolution@gmail.com</li>
+            <li className='text-base'>📍 49 Nguyễn Đỗ Cung, phường Tây Thạnh, quận Tân Phú, TP.HCM</li>
           </ul>
         </div>
         <div>

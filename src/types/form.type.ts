@@ -8,6 +8,7 @@ export interface Form {
   companyName: string
   fieldName: string
   isAdvised?: boolean
+  hasAccount?: boolean
 }
 
 export type CreateFormBody = {

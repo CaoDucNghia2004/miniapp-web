@@ -114,7 +114,7 @@ export default function Login() {
   return (
     <div className='bg-gradient-to-br from-stone-100 via-white to-orange-50'>
       <Helmet>
-        <title>Đăng nhập - MiniApp</title>
+        <title>MiniApp - Đăng nhập</title>
         <meta name='description' content='Đăng nhập để sử dụng các tính năng của trang web' />
       </Helmet>
       <div className='max-w-7xl mx-auto px-4'>

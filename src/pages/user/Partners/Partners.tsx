@@ -70,7 +70,7 @@ export default function Partners() {
       >
         <div className='max-w-6xl mx-auto'>
           <h3 className='text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 text-center mb-12'>
-            VietSunCo đồng hành cùng họ để tạo ra Mini App
+            SOD Solution đồng hành cùng họ để tạo ra Mini App
           </h3>
           <div className='flex flex-col md:flex-row items-center justify-center gap-10 mb-12 '>
             <img src={mockup1} alt='MiniApp 1' className='w-[250px] md:w-[220px]' />

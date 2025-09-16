@@ -16,7 +16,6 @@ import {
 } from 'antd'
 import {
   EditOutlined,
-  PlusOutlined,
   DollarOutlined,
   EyeOutlined,
   FileTextOutlined,
@@ -52,7 +51,6 @@ export default function PaymentManagement() {
   const queryClient = useQueryClient()
 
   const [messageApi, contextHolder] = message.useMessage()
-
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
 
   const { data: projectsRes } = useQuery({
@@ -302,19 +300,6 @@ export default function PaymentManagement() {
                 { label: '❌ Đã hủy', value: 'CANCELLED' }
               ]}
             />
-            <Button
-              type='primary'
-              icon={<PlusOutlined />}
-              onClick={() => {
-                setSelectedProject(null)
-                setSelectedPhase(null)
-                setCurrentPayment(null)
-                form.resetFields()
-                setOpenModal(true)
-              }}
-            >
-              Tạo thanh toán
-            </Button>
           </Space>
         }
       >
@@ -331,20 +316,11 @@ export default function PaymentManagement() {
       >
         <Form form={form} layout='vertical' onFinish={handleSubmit} className='space-y-4'>
           <Card size='small' title='📌 Thông tin dự án' bordered={false}>
-            <Form.Item label='Chọn dự án' name='projectId' rules={[{ required: true }]}>
-              <Select
-                placeholder='Chọn dự án'
-                onChange={(value) => {
-                  const project = projects.find((p) => p.id === value) || null
-                  setSelectedProject(project)
-                  setSelectedPhase(null)
-                  setCurrentPayment(null)
-                  form.resetFields()
-                  form.setFieldValue('projectId', value)
-                }}
-                options={projects.map((p) => ({ label: p.name, value: p.id }))}
-              />
-            </Form.Item>
+            {selectedProject && (
+              <p>
+                <b>Dự án:</b> {selectedProject.name}
+              </p>
+            )}
           </Card>
 
           <Divider />

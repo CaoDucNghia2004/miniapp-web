@@ -29,9 +29,10 @@ export default function ChangePassword() {
       })
       toast.success(res.data.message || 'Đổi mật khẩu thành công')
       reset()
-    } catch (error) {
-      console.log(error)
-      toast.error('Đổi mật khẩu thất bại!')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const errMsg = error?.response?.data?.message || 'Đổi mật khẩu thất bại!'
+      toast.error(errMsg)
     }
   })
 

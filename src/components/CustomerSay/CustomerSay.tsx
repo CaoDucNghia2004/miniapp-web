@@ -11,7 +11,7 @@ const feedbacks = [
   {
     title: 'Dịch vụ tận tâm',
     content:
-      'Vietsunco đã giúp chúng tôi xây dựng website giới thiệu doanh nghiệp vô cùng chỉn chu. Đội ngũ phản hồi rất nhanh, hỗ trợ chỉnh sửa đến khi hài lòng.',
+      'SOD Solution đã giúp chúng tôi xây dựng website giới thiệu doanh nghiệp vô cùng chỉn chu. Đội ngũ phản hồi rất nhanh, hỗ trợ chỉnh sửa đến khi hài lòng.',
     name: 'Chị Hà',
     industry: 'Lĩnh vực mỹ phẩm cao cấp',
     avatar: customer2
@@ -19,7 +19,7 @@ const feedbacks = [
   {
     title: 'Rất đáng tin cậy',
     content:
-      'Chúng tôi hợp tác với Vietsunco cho dự án thiết kế MiniApp bán hàng nội bộ. Không chỉ đúng tiến độ mà UI/UX cực kỳ dễ dùng.',
+      'Chúng tôi hợp tác với SOD Solution cho dự án thiết kế MiniApp bán hàng nội bộ. Không chỉ đúng tiến độ mà UI/UX cực kỳ dễ dùng.',
     name: 'Anh Minh',
     industry: 'Ngành hàng tiêu dùng',
     avatar: customer1
@@ -35,7 +35,7 @@ const feedbacks = [
   {
     title: 'Triển khai nhanh chóng',
     content:
-      'Chúng tôi bất ngờ với tốc độ triển khai MiniApp của Vietsunco. Chỉ trong vài tuần là có thể chạy thử nghiệm. Một đối tác rất linh hoạt.',
+      'Chúng tôi bất ngờ với tốc độ triển khai MiniApp của SOD Solution. Chỉ trong vài tuần là có thể chạy thử nghiệm. Một đối tác rất linh hoạt.',
     name: 'Chị An',
     industry: 'Thời trang và phụ kiện',
     avatar: customer4
@@ -62,10 +62,10 @@ export default function CustomerSay() {
   return (
     <section className='bg-sky-50 py-20'>
       <div className='max-w-7xl mx-auto px-4'>
-        <h2 className='text-3xl font-bold text-center mb-4'>KHÁCH HÀNG NÓI GÌ VỀ VIETSUNCO</h2>
+        <h2 className='text-3xl font-bold text-center mb-4'>KHÁCH HÀNG NÓI GÌ VỀ SOD SOLUTION</h2>
         <p className='text-center text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed'>
-          Cảm ơn tất cả khách hàng đã luôn tin tưởng và đồng hành cùng VIETSUNCO. Chúng tôi cam kết tiếp tục cải tiến và
-          đồng hành cùng doanh nghiệp Việt.
+          Cảm ơn tất cả khách hàng đã luôn tin tưởng và đồng hành cùng <strong>SOD SOLUTION</strong>. Chúng tôi cam kết
+          tiếp tục cải tiến và đồng hành cùng doanh nghiệp Việt.
         </p>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>

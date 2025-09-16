@@ -47,7 +47,7 @@ export default function RegisterCTA() {
               viewport={{ once: true }}
               className='text-[#001858] mt-4 text-lg leading-relaxed max-w-xl'
             >
-              Bạn đã tin tưởng chúng tôi và có ý tưởng cần triển khai? Hãy để Vietsunco biến điều đó thành hiện thực.
+              Bạn đã tin tưởng chúng tôi và có ý tưởng cần triển khai? Hãy để SOD Solution biến điều đó thành hiện thực.
             </motion.p>
 
             <motion.div
