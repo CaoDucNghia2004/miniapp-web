@@ -52,7 +52,7 @@ export default function FeatureHighlight() {
           Các tính năng nổi bật có thể tích hợp
         </h2>
         <p className='text-center text-md text-gray-600 mb-10'>
-          ...tự tin là đối tác tin cậy trong gia công app theo yêu cầu ở mọi lĩnh vực
+          SOD Solution tự tin là đối tác tin cậy trong gia công app theo yêu cầu ở mọi lĩnh vực
         </p>
 
         <div className='space-y-10'>

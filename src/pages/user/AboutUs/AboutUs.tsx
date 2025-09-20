@@ -33,7 +33,7 @@ export default function AboutUs() {
             <FaLightbulb className='text-5xl text-orange-400 mx-auto mb-4 animate-bounce' />
           </motion.div>
           <motion.h1 className='text-4xl md:text-5xl font-bold text-orange-600 mb-6' custom={1} variants={fadeInUp}>
-            Về Vietsunco
+            Về SOD Solution
           </motion.h1>
           <motion.p
             className='text-lg md:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed'
@@ -124,7 +124,7 @@ export default function AboutUs() {
             <FaRocket className='text-5xl text-orange-400 mx-auto mb-4 animate-pulse' />
           </motion.div>
           <motion.h2 className='text-3xl md:text-4xl font-bold mb-4' variants={fadeInUp} custom={1}>
-            Sẵn sàng cùng Vietsunco chuyển mình trong thời đại số?
+            Sẵn sàng cùng SOD Solution chuyển mình trong thời đại số?
           </motion.h2>
           <motion.p className='mb-8 text-lg md:text-xl max-w-2xl mx-auto' variants={fadeInUp} custom={2}>
             Chúng tôi ở đây để đồng hành và xây dựng giải pháp MiniApp tối ưu nhất cho doanh nghiệp của bạn.

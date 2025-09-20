@@ -55,7 +55,7 @@ export default function Partners() {
             <p className='text-gray-700 text-sm md:text-base leading-relaxed'>
               Trước đây, họ dựa vào mạng xã hội để quảng bá sản phẩm. Tuy nhiên, việc quản lý đơn hàng, trò chuyện với
               khách và tạo dựng thương hiệu cá nhân là bài toán khó. Họ cần một không gian riêng, đơn giản nhưng chuyên
-              nghiệp để thể hiện mình — đó chính là lúc họ tìm đến MiniApp của ...
+              nghiệp để thể hiện mình — đó chính là lúc họ tìm đến MiniApp của SOD Solution.
             </p>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function Partners() {
       >
         <div className='max-w-6xl mx-auto'>
           <h3 className='text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 text-center mb-12'>
-            SOD Solution đồng hành cùng họ để tạo ra Mini App
+            SOD Solution đồng hành cùng họ để tạo ra MiniApp
           </h3>
           <div className='flex flex-col md:flex-row items-center justify-center gap-10 mb-12 '>
             <img src={mockup1} alt='MiniApp 1' className='w-[250px] md:w-[220px]' />
